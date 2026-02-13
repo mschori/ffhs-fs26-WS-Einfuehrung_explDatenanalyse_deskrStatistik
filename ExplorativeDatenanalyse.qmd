@@ -57,6 +57,12 @@ Beispiele:
 - Merkmal MachineType: Ausprägung ist A, B
 - Merkmal CycleTime: Ausprägung ist z.B. 78 s, 412 s (konkrete Urwerte)
 
+**Diskretes Merkmal**<br>
+Kann nur abzählbare, voneinander getrennte Werte annehmen.
+
+**Stetiges Merkmal**<br>
+Kann innerhalb eines Intervalls beliebig viele Zwischenwerte annehmen.
+
 ## Merkmalausprägungen
 
 Merkmale/Variablen unterscheiden sich teilweise erheblich. Das Merkmal Farbe kennt nur Merkmalausprägungen wie rot, grün, blau. Hingegen die Leistung des Motors in PS wird numerisch angegeben. 
@@ -82,6 +88,13 @@ Wichtig sind also die folgenden Bezeichnungen:
   - Intervallskala: kein natürlicher Nullpunkt (z. B. °C im Gegensatz zu K (Kelvin mit absolutem Nullpunkt)) → Quotienten nicht sinnvoll.
   - Verhältnisskala: natürlicher Nullpunkt, z.B. Körpergewicht (negativer Wert nicht sinnvoll); Kelvintemperaturskala → Quotienten sinnvoll (z. B. Zeit).
   - Absolutskala: Sonderfall mit natürlicher Einheit (z. B. Anzahl).
+- Reliablität: Wie genau misst ein Messinstrument?
+  - Reliabilität beschreibt, wie stark ein gemessener Wert durch den "wahren Wert" bestimmt ist - und nicht durch Zufall oder Messfehler => Je kleiner der Fehleranteil, desto höher die Reliabilität!
+  - Geringe Realibilität verhindert in der Regel Validität
+  - Realibilität bedeutet, dass das Verfahren exakt misst
+  - Ein Verfahren kann sehr zuverlässig falsche Dinge messen, z.B. wenn ein Sensor einen Offsetfehler hat => daher bedeutet ein hoch reliables Verfahren nicht automatisch hoch valide
+- Validität: bedeutet, dass wirklich das gemessen wird, was gemessen werden soll
+- Operationalisierung: legt fest, wie ein Merkmal messbar gemacht wird
 
 
 **Merksatz:** Das Skalenniveau entscheidet, welche Operationen (zählen, ordnen, Differenzen, Quotienten) sinnvoll interpretierbar werden können für ein Merkmal/Variable.
