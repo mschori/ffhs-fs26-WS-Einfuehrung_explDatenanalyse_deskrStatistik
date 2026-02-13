@@ -1,0 +1,261 @@
+---
+title: "HandsOn_EDA_Fallstudie_E-Scooter"
+format: html
+---
+
+# Aufgabe
+Explorative Datenanalyse (EDA) durchführen, um die folgenden Aspekte klären zu können.
+
+1. Nachfrage-Peaks über den Tag identifizieren
+2. typische vs. auffällige Fahrten erkennen 
+3. prüfen, ob Abbrüche mit der Akkuwarnung zusammenhängen
+
+Anschliessend sollen konkrete betriebliche Massnahmen abgeleitet werden. Dazu gehören zum Beisipel Rebalancing-/Charging-Zeiten, Umgang mit Ausreissern und die Priorisierung von Akku-Cheks.
+
+# Beschreibung der Daten
+In der Woche vom 10. bis 17. Mai 2025 wurden Fahrten mit E-Scootern eines Anbieters als Testdatensatz in einer schweizer Stadt (anonymisiert) protokolliert. Der Datensatz enthält 2000 Fahrten.
+
+Die folgenden Variablen befinden sich im Datensatz. Eine Zeile entspricht einer einzelnen Scooter-Fahrt.
+
+![Scooter.csv Variablenbeschreibung](images/Scooter_Variablenbeschreibung.png)
+
+In dieser Aufgabe werden Datums- und Uhrzeitangaben im Rahmen des Data Wranglings angepasst werden müssen. Die state-of-the-art Library dazu ist lubridate. 
+
+# Aufgabe 1: Import und erste Orientierung
+## Import des Datensatzes
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+
+scooter <- read_csv("data/scooter.csv", show_col_types = FALSE)
+
+print("Anzahl Scooter-Modelle (scooter_type):")
+
+scooter |> # Nimm das Ergebnis scooter und übergib es als erstes Argument an die Funktion count
+  count(scooter_type)
+```
+
+## Variablentypen und Auffälligkeiten in den Daten
+Welche Variablen sind numerisch, welche kategorial? Nennen Sie mindestens 2 Variablen pro Typ und begründen Sie kurz. Gibt es Auffälligkeiten?
+
+```{r}
+glimpse(scooter)
+summary(scooter)
+```
+
+Numerisch sind user_rating, trip_distance_m und trip_duration_s
+
+Kategorial sind trip_id, scooter_type, battery_low und trip_aborted
+
+Zeitvarialbe/Zeitindex ist start_time
+
+# Aufgabe 2: Data Wrangling
+## Variablentransformation
+Eine neue Spalte trip_duration_min, die die Fahrtdauer in Minuten angbit, erstellen. 
+Stören die NAs die Umrechung (Datentransformation)? Begründen Sie kurz.
+
+```{r}
+library(lubridate)
+
+scooter <- scooter %>%
+  mutate(trip_duration_min = trip_duration_s / 60)
+summary(scooter)
+```
+
+Die NAs scheinen die Umrechnung nicht zu stören. Das liegt daran, dass ein NA Wert auch nach der arithemtischen Operation NA bleibt.
+
+## Entfernung Fahrten < 1 Min.
+Da häufig der Vorgang bei der Initialisierung abgebrochen wird, sollen alle Fahrten mit trip_duration_min < 1 Min. entfernt werden.
+
+Warum ist die naheliegende Codelösung scooter |> filter(trip_duration_min >= 1) problematisch? Analysieren Sie das summary(scooter), was fällt auf? Wie kann man es korrekt machen?
+
+```{r}
+scooter |>
+  filter(trip_duration_min >= 1) |>
+  summary()
+```
+
+Diese Lösung ist problematisch, da alle NAs direkt entfernt werden.
+
+Die folgende Lösung zeigt, dass die NAs nicht entfernt werden.
+
+
+```{r}
+scooter |>
+  mutate(trip_duration_min = trip_duration_s / 60) |>
+    filter(is.na(trip_duration_min) | trip_duration_min >= 1) %>%
+  summary()
+```
+
+Und hier jetzt speichern in der scooter-Variable.
+
+```{r}
+scooter <- scooter |>
+  filter(is.na(trip_duration_min) | trip_duration_min >= 1)
+summary(scooter)
+```
+
+## Fehlende Werte
+In der Variablen trip_distance_m gibt es Werte, die fehlen. Wie hoch ist der Anteil an allen Beobachtungen? Wenn sie unter 10% sind sollen diese entfernt werden.
+
+```{r}
+library(glue)
+
+summary(scooter$trip_distance_m)
+na_dist <- sum(is.na(scooter$trip_distance_m))
+n_total <- nrow(scooter)
+
+print(glue("Anzahl Zeilen: {n_total}"))
+print(glue("Anzahl fehlender Werte: {na_dist}"))
+print(glue("Anteil der fehlenden Distanzwerte: {na_dist / n_total}"))
+```
+
+Da der Anteil unter 10% liegt, werden die fehlenden Beobachtungen entfernt.
+
+```{r}
+scooter <- scooter |>
+  filter(!is.na(trip_distance_m))
+summary(scooter$trip_distance_m)
+print(glue("Anzahl Beobachtungen(Zeilen): {nrow(scooter)}"))
+```
+
+## Erzeugung neuer Variablen
+Das Management interessiert sich vor allem dafür, zu welchen Uhrzeiten an welchen Wochentagen die Nutzer ihren E-Scooter verwenden. Generieren Sie die beiden neuen Variablen start_hour und weekday.
+
+```{r}
+scooter <- scooter |>
+  mutate(
+    start_hour = hour(start_time),
+    weekday = wday(start_time, label = TRUE, abbr = TRUE)
+  )
+summary(scooter)
+```
+
+# Aufgabe 3: Datenvisualisierung, Kennwerte (Metriken)
+## Wie verteilt sich die durchschnittliche Fahrtdauer auf die Wochentage?
+
+```{r}
+scooter |>
+  group_by(weekday) |>
+  summarise(
+    mean_duration = mean(trip_duration_min, na.rm = TRUE), # mean ist das arithmetische Mittel der Werte
+    n = n() # n() ist ein Zähler und gibt die Anzahl der Beobachtrungen in der aktuellen Gruppe zurück
+  ) |>
+  arrange(weekday)
+```
+
+```{r}
+scooter |>
+  count(start_hour) |>
+  ggplot(aes(x = start_hour, y = n)) +
+  geom_col() +
+  labs(x = "Startstunde (0–23)", y = "Anzahl Fahrten")
+```
+
+## Welche Fahrtdauern und -distanzen sind "typisch" und welche sind Ausreisser?
+Erstellen Sie ein Boxplots der Fahrtdauer (trip_duration_m)/Dauer (trip_distance_m) nach Tageszeit-Klasse und bestimmen Sie die Kennwerte (IQR, Mean, Median).
+
+Diskutieren Sie kurz: was bedeutet das für die Akkulaufzeit und die erwartete Anzahl Fahrten pro Scooter (bei gleicher Verfügbarkeit)?
+
+```{r}
+library(lubridate)
+
+scooter <- scooter |>
+  mutate(
+    time_block = case_when(
+      start_hour %in% 0:5   ~ "Nacht (0–5)",
+      start_hour %in% 6:9   ~ "Morgen (6–9)",
+      start_hour %in% 10:15 ~ "Tag (10–15)",
+      start_hour %in% 16:19 ~ "Abend (16–19)",
+      TRUE                  ~ "Spät (20–23)"
+    ),
+    time_block = factor(time_block,
+                        levels = c("Nacht (0–5)","Morgen (6–9)","Tag (10–15)","Abend (16–19)","Spät (20–23)"))
+  )
+
+ggplot(scooter, aes(x = time_block, y = trip_duration_min)) +
+  geom_boxplot() +
+  labs(x = "Tageszeit-Klasse", y = "Fahrtdauer (Minuten)")
+```
+
+```{r}
+scooter |>
+  group_by(time_block) |>
+  summarise(
+    n = n(),
+    mean_duration = mean(trip_duration_min, na.rm = TRUE),
+    median_duration = median(trip_duration_min, na.rm = TRUE),
+    iqr_duration = IQR(trip_duration_min, na.rm = TRUE)
+  ) |>
+  arrange(time_block)
+```
+
+```{r}
+ggplot(scooter, aes(x = time_block, y = trip_distance_m)) +
+  geom_boxplot() +
+  labs(x = "Tageszeit-Klasse", y = "Distanz (Meter)")
+```
+
+```{r}
+scooter |>
+  group_by(time_block) |>
+  summarise(
+  n = n(),
+  mean_distance = mean(trip_distance_m, na.rm = TRUE),
+  median_distance = median(trip_distance_m, na.rm = TRUE),
+  q1_distance = quantile(trip_distance_m, probs = 0.25, na.rm = TRUE),
+  q3_distance = quantile(trip_distance_m, probs = 0.75, na.rm = TRUE),
+  iqr_distance = IQR(trip_distance_m, na.rm = TRUE)
+)
+```
+
+## Abbruchquote wegen battery_low
+Wie viele Fahrten "verlieren" wir, weil der Batteriestand zu niedrig ist, d.h. ein Kunde oder eine Kundin befürchtet aufgrund des Batteriestandes nicht bis ans Ziel zu gelangen?
+
+Analysieren Sie hierfür, ob die Abbruchrate bei niedrigem Batteriestand höher ist und visualisieren Sie den Zusammenhang mit einem Balkendiagramm.
+
+```{r}
+scooter |>
+  group_by(battery_low) |>
+  summarise(
+  n = n(),
+  abort_rate = mean(trip_aborted, na.rm = TRUE) # na.rm bedeutet, dass NAs nicht berücksichtigt werden
+  )
+```
+
+```{r}
+scooter |>
+   group_by(battery_low) |>
+   summarise(abort_rate = mean(trip_aborted, na.rm = TRUE)) |>
+   ggplot(aes(x = battery_low, y = abort_rate)) +
+   geom_col() +
+   labs(x = "Akkustand-Warnung (battery_low)", y = "Abbruchrate")
+```
+
+Zu erkennen ist, dass die Abbruchrate bei niedrigem Akku doppel so gross ist.
+
+## Verlorene Fahrten
+Mit einem Diagramm soll dargestellt werden, zu welchen Tageszeitklassen wir wie viele Fahrten "verlieren". Basierend auf der Variable trip_aborted.
+
+```{r}
+scooter |>
+  group_by(time_block) |>
+  summarise(lost_trips = sum(trip_aborted, na.rm = TRUE)) |>
+  ggplot(aes(x = time_block, y = lost_trips)) +
+  geom_col() +
+  labs(x = "Tageszeit-Klasse", y = "Verlorene Fahrten (Abbrüche)")
+```
+
+# Nächste mögliche Schritte
+Sie haben schon einige Einblicke in die Eigenschaften der Daten erhalten. Im zyklischen Ablauf der EDA wäre nun eine neue Frage/Hypothese an die Daten zu formulieren. Welchen interessanten Fragen könnte man als nächstes nachgehen?
+
+1. Gibt es Auffälligkeiten in der Beziehung zwischen user_rating und trip_distance_m?
+2. Zu welchen Tageszeitklassen fallen die Bewertungen schlecht aus?
+3. Ist bei einem Scooter-Modell der Akkustand deutlich häufiger niedriger als beim anderen Modell?
+4. Welches Scooter-Modell wird bevorzug?
+
+Es lassen sind dutzende weitere interessante Fragen stellen und entsprechende Ergebnisse erarbeiten. Wichtig in der EDA ist, dass die Bedürfnisse der Auftraggeber berücksichtigt werden.
+
+
+

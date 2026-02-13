@@ -1,0 +1,466 @@
+---
+title: "Data_Wrangling"
+format: html
+---
+
+```{r}
+#| message: false
+#| warning: false
+```
+
+Die CSV-Files 'inspections.csv' und 'austinwater.csv' sind zu gross für GitHub und daher im .gitignore. Download über Linkedin-Learning. Die Files sind auch im OneDrive und PVA01 zu finden.
+
+# Data Wrangling
+Mit Data-Wrangling ist das Aufräumen von Daten gemeint. Wenn wir sauber aufgeräumte Daten vorliegen haben, spricht man von Tidy Data.
+
+Andere Bezeichnungen für Data-Wrangling: 
+
+- Data-Cleaning
+- Data-Munging
+- Data-Preparation
+
+Daten müssen immer wieder aufgeräumt werden, das ist kein einmaliger Task.
+
+Wieso wollen wir tidy-Data?
+
+- Facilitates initial exploration and analysis
+- Improves ability to collaborate with others
+- Offers a standardized format to exchange data between tools
+
+Tidyverse: Tools that work together to transfrom, analyze, and visualize data.
+
+Tidy-Data-Elements:
+
+- Variables: measure some underlying attribute (height, duration, frequency)
+- Observations: are the collection of all measurements for variables related to a single entity
+- Values: reside at the intersection of variables and observations
+
+Beispiel für Rearrangment.
+
+![Rearranging of treatment data](images/rearranging_treatment_data.png)
+
+- Die Variablen sind hier: Name, TRT (Treatment-Type), Result
+- Die Observations sind: die 6 Zeilen mit den Beobachtungen
+- Die Values sind die 16 einzelnen Daten, also jede einzelne Zelle
+
+## Three Rules of Tidy Data
+- Each variable forms a column
+- Each observation forms a row
+- Each type of observational unit forms a table
+  - Die ganzen Daten werden in eine einzelne Tabelle gepackt. Wenn das nicht möglich ist, müssen neue Tabellen und somit neue Boebachtungen erstellt werden
+  
+## Common problems to many datasets
+- Column headers are values, not varaible names
+- Multiple variables are stored in one column
+- Variables are stored in both rows and columns
+- Multiple types of observational units are in the same table
+- A single observational unit is in multiple tables
+
+### Column headers as Values
+
+![Column headers as values - bad example](images/Column_headers_as_values.png)
+
+
+Analyse-Programme können damit nicht arbeiten, daher umwandeln zu folgendem.
+
+![Column headers as values - tidy example](images/Column_headers_as_values_now_tidy.png)
+
+### Multiple variables are stored in one column
+
+![Multiple varaibles are stored in one column - bad example](images/Multiple_variables_in_one_column.png)
+![Multiple varaibles are stored in one column - tidy example](images/Multiple_variables_in_one_column_now_tidy.png)
+Wichtig ist hier, dass eine zusätzliche Spalte für "Sex" hinzugefügt werden musste. Nur so lassen sich die Werte von Age korrekt auseinanderhalten. Ansonsten hätten wird erneut nicht-atomare-Daten.
+
+### Variables are stored in both rows and columns
+
+![Variables are stored in both rows and columns - bad example](images/variables_in_both_row_and_columns.png)
+![Variables are stored in both rows and columns - tidy example](images/variables_in_both_row_and_columns_now_tidy.png)
+Wichtig: tmax und tmin sind auf zwei Spalten aufgeteilt, damit wird weniger Zeilen haben.
+
+### Multiple types of observational units are in the samte table
+
+Zum Beispiel wenn wir Wetterdaten und TV-Daten in der gleichen Tabelle haben.
+
+### A single observational unit is in multiple tables
+
+Die Wetter-Daten sind für jeden Monat in anderen Tabellen. Diese müssen kombiniert werden, damit die Datenanalyse einfacher wird.
+
+
+# Tidyverse R-Package
+
+Wird für die Bereinigung von Daten verwendet.
+
+Major Tidyverse components:
+
+- tibble: Tauscht data-frames mit tibbles aus. Tibbles sind die Grundelemente für R zur Analyse
+- readr and readxl: Ermöglicht import und export von Daten
+- dplyr and tidyr: Zur Veränderung von Daten
+- stringr: Manipulation von Texten
+- lubridate: Manipulation von Datum und Zeit
+- ggplot2: Ermöglicht die Daten-Visualisation
+
+Das Packet kann komplett mit <install.packages("tidyverse")> installiert werden. Aber R-Studio macht da automatisch, wenn man das Package verwendet.
+
+Geladen wird das package in R mit <library(tidyverse)>. 
+
+Man muss das Package regelmässig updaten mit tidyverse_update().
+
+# Arbeiten mit Tibbles
+Tibbles sind die core-data-frames für tidyverse. Daher müssen alle data-frames in tibbles umgewandelt werden.
+
+Umwandeln kann man mit:
+
+- as_tibble(): build a tibble from an existing data-frame
+- tibble(): build a tibble from scratch
+- import: build a tibble form an external data source
+
+```{r}
+CO2 # Dataset, das bereits in R integriert ist => für testings, etc.
+
+#| message: false
+#| warning: false
+library(tidyverse)
+
+co2_tibble <- as_tibble(CO2) # Umwandeln zu tibles
+co2_tibble
+
+print(co2_tibble, n=20) # print 20 lines => n=Inf würde alles printen, da infinity
+
+# Tibbles können auch Vektoren generiert werden. c Function crates a vektor. 
+name <- c('Mike', 'Renee', 'Matt', 'Chris', 'Ricky')
+birthday <- c(2000, 2001, 2002, 2003, 2004)
+eyecolor <- c('blue', 'brown', 'hazel', 'brown', 'blue')
+people <- tibble(name, birthday, eyecolor)
+people
+```
+
+## Tibbles unterteilen
+Subsetting extracts a single variable from a tibble for further analysis.
+
+- $: Extracts a variable as a vector from at ibble by name
+- [[]]: Extracts a varible as a vector from a tibble by name OR position
+
+```{r}
+people$eyecolor # $-Operator
+unique(people$eyecolor)
+
+people[['eyecolor']]
+people[[3]]
+
+```
+
+## Filter Tibbles
+Filtering reduces the number of rows in a tibble according to some criteria.
+
+Dabei werden die Daten nicht verändert. Lediglich gefiltert.
+
+```{r}
+filter(people, eyecolor=='blue')
+browneyes <- filter(people, eyecolor=='brown')
+browneyes
+
+filter(people, eyecolor=='blue' | birthday > 2002) # OR
+filter(people, eyecolor=='blue' & birthday > 2002) #AND
+```
+
+# Import Data in R
+
+Dateien können importiert werden. Über lokale Pfade und sogar über Web-URLs.
+
+```{r}
+inspections <- read_csv("data/inspections.csv")
+glimpse(inspections) # Die Contents anschauen
+
+names <- c('ID', 'DBAName', 'AKAName', 'License', 'FacilityType', 'Risk', 'Address', 'City', 'State', 'Zip', 'InspectionDate', 'InspectionType', 'Results', 'Violations', 'Latitude', 'Longitude', 'Location')
+
+# Verwende meinen eigenen Vektor für die Namensgebung der Spalten
+inspections <- read_csv("data/inspections.csv", col_names=names) 
+glimpse(inspections)
+
+# Jetzt muss die erste Zeile übersprungen werden, damit die Spaltentitel nicht als Daten erscheinen
+inspections <- read_csv("data/inspections.csv", col_names=names, skip=1) 
+glimpse(inspections)
+```
+
+Natürlich können auch die Attirbut-Typen über einen vektor mitgegeben werden. Einfach einen Vektor mit den Datentypen erstellen und dann bei read_csv über den Parameter col_types mitgeben.
+
+## Verschiedene Files für den Import
+
+- Tab-Separated Values (TSV): Statt mit Komma, wird hier mit Tabulatoren getrennt
+  - Import mit read_tsv()
+- Character-Separated Values: Statt mit Komma, wird über ein bestimmtes Zeichen getrennt
+  - Import mit read_delim()
+  - Wenn z.B. das Trennzeichen '^' ist, dann mit read_delim('filename', delim='^')
+- Fixed-Width-Files: Separiert wird mit mehreren Leerzeichen, damit alles gleich steht
+  - Import mit read_fwf('filename', widths)
+  - widths ist ein Vektor mit der Anzahl Zeichen pro Attribut
+- Excel-Daten: Excel-Dateien importieren => ist nicht Teil von tidyverse. Muss mit library(readxl) importiert werden
+  - Import mit read_excel('filename')
+  - Unbedingt Zeilen Skippen, falls Titel im Excel vorhanden sind => Skippen bis zur Zeile mit den Attributen
+  - Oftmals müssen die Attributnamen über eigene Vektoren mitgegeben werden => je nach Gestaltung des Excel-Files
+  - Auch müssen oftmals Prozente umgewandelt werden mit mutate()
+- Import über Datenbanken und Web
+  - Import über RODBC (R Open Database Connectivity) Package
+    - Ist nicht Teil von tidyverse und unterstützt keine tibbles!
+  - Import auch direkt über URLs => z.B. bei read_csv
+  
+# Datentransformation
+
+## Breite vs. lange Datensätze
+Wide datasets have more columns.
+
+Long datasets have more rows.
+
+Longer datasets sind in R einfacher zu manipulieren. => aber beide Arten sind ok und können verwendet werden.
+
+Um wide Datensätze zu long zu machen, kann die Funktion pivot_longer() verwendet werden.\n
+=> pivot_longer(data, columns, names_to, values_to)
+
+```{r}
+pew <- read.csv('data/pew.csv')
+pew.long <- pivot_longer(pew, !religion, names_to='income', values_to='freq')
+pew.long
+```
+
+![Wide to long](images/pivot_longer.png)
+
+
+Um long Datensätze zu wide zu machen, kann die Funtion pivot_wider() verwendet werden.\n
+=> pivot_wider(data, names_from, values_from)
+
+```{r}
+weather <- read_csv('data/mexicanweather.csv')
+weather.wide <- pivot_wider(weather, names_from=element, values_from=value)
+weather.wide
+```
+
+![Long to wide](images/pivot_wider.png)
+
+## Konvertieren von Datentypen in R
+Data Types:
+
+![Data-Types](images/data_types.png)
+
+tidyverse ist extrem gut im selbstständig herausfinden, um welche Datentypen es sich handelt. Aber trotzem muss das manchmal angepasst werden.
+
+Funktionen dafür:
+
+- as.numeric()
+- as.integer()
+- as.character()
+- as.logical()
+- as.factor()
+
+Mit den folgenden Funktionen kann der Datentyp geprüft werden.
+
+- is.numeric()
+- is.integer()
+- is.character()
+- is.logical()
+- is.factor()
+
+### Datums- und Uhrzeitangaben
+Dazu wird das Package lubridate verwendet. Es ist nicht Teil von tidyverse und muss mit package(lubridate) importiert werden.
+
+Mit den folgenden Funktionen können bestimmte Werte aus einem date bezogen werden.
+
+- year()
+- month()
+- day()
+- wday(): Day of the week
+- yday(): Day of the year
+- hour()
+- minute()
+- second()
+
+Daten kommen in unterschiedlichen Darstellungen. Y.M.D oder D.M.Y, etc.
+Daher müssen verschiedene Funktion zur Intepretation der Daten verwendet werden.
+
+![Date-Functions](images/Date-Functions.png)
+
+```{r}
+library(lubridate)
+
+# Add new columns for year, month and day
+weather |>
+  mutate(year=year(date), month=month(date), day=day(date))
+```
+
+# Datenbereinigung
+Oftmals sind Datensätze ausserhalb der Norm. Diese müssen analysiert und entfernt werden. Meistens handelt es sich bei diesen Datensätzen um fehlerhafte Datensätze.
+
+Es gilt jedoch immer zu berücksichtigen, dass einige Datensätze gewünscht sind. Also eigentlich absichtlich von der Norm abweichen. Diese dürfen nicht entfernt werden.
+
+Um Ausreisser zu erkennen, kann das Boxlot gut helfen. Hier wird der Median gekennzeichnet und die Werte links und rechts davon bis zu einger gewissen Grenze. Alles ausserhalb sind dann Ausreisser.
+
+```{r}
+names <- c('DRG', 'ProviderID', 'Name', 'Address', 'City', 'State', 'ZIP', 'Region', 'Discharges', 'AverageCharges', 'AverageTotalPayments', 'AverageMedicarePayments')
+types <- c('ccccccccinnn')
+inpatient <- read_tsv('data/inpatient.tsv', col_names=names, skip=1,col_types=types)
+
+
+ggplot(data=inpatient) +
+  geom_histogram(mapping=aes(x=AverageCharges))
+
+ggplot(data=inpatient) +
+  geom_boxplot(mapping=aes(State, AverageCharges))
+
+inpatient |>
+  filter(AverageCharges > 500000) |>
+  ggplot() +
+  geom_point(mapping=aes(DRG, AverageCharges)) +
+  theme(axis.test.x = element_text(angle=90, vjust=1, hjust=1))
+
+```
+
+## Fehlende und spezielle Werte
+### Fehlende Werte => NA
+Fehlende Werte sind etwas Übliches. R stellt diese Werte mit NA (Not available) dar.
+
+Die vorliegenden Daten müssen analysiert werden. Wird zum Beispiel ein fehlender Wert in den Daten mit 999999 dargestellt. Müssen diese in NAs umgewandelt werden, damit die weitere Datenverarbeitung klappt.
+
+Folgend ist zu sehen, dass für das Attribut "License" 14 NAs gefunden wurden.
+
+```{r}
+summary(inspections)
+
+inspections |>
+  filter(is.na(License))
+```
+
+Wird der Filter auf License angewenset, erkennen wir, dass diese Datensätze noch nicht genau identifiziert werden können. Werden diese Werte benötigt oder nicht?
+
+Daher können wir zwei Datensätze erstellen, die jeweils lizensierte und nicht lizensierte beinhalten.
+
+```{r}
+unlicensed <- inspections |>
+  filter(is.na(License))
+
+licensed <- inspections |>
+  filter(is.na(License))
+```
+
+### Spezielle Werte
+Folgende speziellen Typen sind möglich:
+
+- Inf: Represents infinite values, such as dividing a non-zero number by zero
+  - is.infinite(): detects infinite values
+- NaN: Represents values that result in not a number, such as dividing zero by zero
+  - is.nan(): detect NaN Values
+  
+```{r}
+badmath <- c(1,2,3,4/0,0/0, NA)
+badmath
+
+is.na(badmath)
+is.nan(badmath)
+is.infinite(badmath)
+is.finite(badmath)
+```
+
+## spalten aufbrechen
+Spalten könne mit separate() aufgebrochen werden. Dabei wird ein Separator angegeben.
+
+=> separate(data, col, into, sep)
+
+Folgend ist ersichtlich, dass mehrere Werte in der gleichen Spalte zu finden sind.Einerseits ein Code und andererseits die Bezeichnung. Dazwischen sind die beiden Informationen mit einem '-' separiert.
+
+```{r}
+unique(inpatient$DRG)
+```
+
+Also wollen wir diese aufbrechen.
+
+```{r}
+separate(inpatient, DRG, c('DRGcode', 'DRGdescription'), '-')
+```
+
+Es wird eine Fehlermeldung ausgegeben. Nämlich, dass einige Zeilen nicht separiert werden konnte. Wenn wir das genauer ansehen (inpatient$DRG[45894]), ist erkennbar, dass zwei '-' im Datensatz zu finden sind. Die Funktion versucht hier also in 3 Spalten aufzuteilen. Was wir aber nicht wollen.
+
+Jetzt können wir also statt auf einem einzelnen character, die Aufteilung nach einer Logik machen.Hier beispielsweise immer nach dem 4. Zeichen.
+
+```{r}
+inpatient <- separate(inpatient, DRG, c('DRGcode', 'DRGdescription'), 4)
+```
+
+## Kombinieren von Spalten mit unite()
+
+Manchmal müssen wir einzelne Attribute zusammenführen. Das kann mit unite() gemacht werden.
+
+=> unite(data, col, from, sep) => der Default für sep ist übrigens Underscrore ('_')
+
+Im folgenden Beispiel ist zu erkennen, dass City und State in unterschiedlichen Spalten zu finden sind. Wir wollen diese nun kombinieren. unite() lässt die zu verbindenden Spalten verschwinden. Sollen diese beibehalten werden, kann der Parameter remove=FALSE mitgegeben werden.
+
+```{r}
+glimpse(inspections)
+```
+
+```{r}
+regional_inspectoins <- unite(inspections, Region, City, State, sep=', ', remove=FALSE)
+glimpse(regional_inspectoins)
+```
+
+## Manipulieren von Zeichenketten mit stringr
+stringr ist Teil von Tidyverse und wird daher mit library(tidyverse) verfügbar.
+
+Case Conversion:
+
+- str_to_upper(): to uppercase
+- str_to_lower(): to lowercase
+- str_to_title(): make first letter to uppercase
+- str_trim(): remove leading and trailing whitespace
+- str_sub(): extract a portion of a string
+- str_detect(): finds strings that match a pattern
+- str_replace(): replace portions of a string what match a pattern
+
+```{r}
+regional_inspectoins <- regional_inspectoins |>
+  mutate(Region=str_to_upper(Region))
+
+# Die fehlerhaften CHICAGO Werte korrigieren
+badchicagos <- c('CCHICAGO, IL', 'CHCICAGO, IL', 'CHICAGOCHICAGO, IL', 'CHCHICAGO, IL', 'CHICAGOI, IL')
+
+regional_inspectoins <- regional_inspectoins |> 
+  mutate(Region=ifelse(Region %in% badchicagos, 'CHICAGO, IL', Region))
+
+unique(regional_inspectoins$Region)
+
+# Leider ist auch noch CHICAGO, NA vorhanden. Also NA statt IL. Das kann folgendermassen behoben werden.
+regional_inspectoins <- regional_inspectoins |> 
+  mutate(Region=ifelse(Region=='CHICAGO, NA', 'CHICAGO, IL', Region))
+
+unique(regional_inspectoins$Region)
+```
+
+Es gibt noch weitere Fehler in diesen Werten. Es existiert z.B. 'NA, NA', 'NA, IL', welche wir beheben müssen. Da wir nicht wisse, wass denn die korrekte Stadt wäre, wandeln wir alle in NAs um.
+
+```{r}
+to_change <- c('NA, IL', 'NA, NA', 'INACTIVE, IL')
+
+regional_inspectoins <- regional_inspectoins |> 
+  mutate(Region=ifelse(Region %in% to_change, NA, Region))
+
+unique(regional_inspectoins$Region)
+```
+
+Weiter mit einem anderen Datensatz: inpatient_separate (von oben)
+
+Wir wollen die unnötigen Leerzeichen entfernen, die aus der Separierung der Spalten erfolgte.
+
+```{r}
+inpatient <- inpatient |> 
+  mutate(DRGcode=str_trim(DRGcode))
+
+glimpse(inpatient)
+```
+
+Jetzt müssen wir auch noch '- ' entfernen.
+
+```{r}
+inpatient <- inpatient |> 
+  mutate(DRGdescription=str_sub(DRGdescription, 3))
+
+glimpse(inpatient)
+```
+
+Es gibt noch viel mehr Funktionen zur Manipulation von Strings. Diese können über das Handbuch der Bibliothek stringr eingesehen werden.

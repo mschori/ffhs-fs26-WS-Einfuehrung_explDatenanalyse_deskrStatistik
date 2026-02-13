@@ -1,0 +1,19 @@
+# RStudio
+.Rproj.user/
+# R session
+.Rhistory
+.RData
+.Ruserdata
+# Quarto / Render output
+*_files/
+*.html
+*.pdf
+*.docx
+# Quarto cache
+.quarto/
+.quarto_cache/
+# Figures
+*.svg
+# Too large files
+data/austinwater.csv
+data/inspections.csv

@@ -1,0 +1,865 @@
+---
+title: "ExplorativeDatenanalyse"
+format: html
+---
+
+# Was ist die explorative Datenanalyse (EDA)?
+In modernen datengetriebenen Unternehmen entstehen täglich riesige Datenmengen. Doch Daten allein erzeugen noch keinen Wert. Erst die Fähigkeit, aus ihnen strukturiertes Wissen abzuleiten, macht sie wirtschaftlich und technisch relevant. Genau hier setzt die Explorative Datenanalyse (Exploratory Data Analysis, EDA) an.
+
+Bevor Modelle entwickelt, Kennzahlen berichtet und Entscheidungen getroffen werden, braucht jedes datenbasierte Projekt eine Phase, in der die Daten verstanden, geprüft und erforscht werden. Die EDA ist hierbei wie ein erster „Rohschnitt“ eines Analyseprojekts: Eine kreative Phase, in der Muster entdeckt, Ideen ausprobiert, Datenprobleme sichtbar gemacht und vielversprechende Spuren identifiziert werden. Erst dieser Rohschnitt zeigt, welche Fragen sich tatsächlich sinnvoll beantworten lassen und welche nicht. Die EDA ist hierbei kein einziger grosser Wurf, sondern eine zyklische Abfolge von Fragen stellen, Kennzahlen bestimmen, visualisieren, transformieren, interpretieren und wieder neue Fragen stellen bis hin zu Modellierung und dem Machine Learning. Das nachfolgende Schema visualisiert diesen zyklischen Charakter der EDA nochmals:
+
+![Zyklischer Charakter der EDA](images/explorative_datenanalyse.png)
+# Einführendes Beispiel in die EDA und deskriptive Statistik
+Im nachfolgenden Beispiel wollen wir die EDA bereits in Aktion sehen. Hierfür haben wir ein Beispiel aus der Prozessanalytik der Fertigung in einem KMU, welches metallische Kleinbauteile für die Automobilindustrie fertig, ausgewählt.
+
+In diesem automatisierten Produktionsprozess werden täglich hunderte identische Werkstücke hergestellt. Während der Fertigung eines Werkstücks messen eine Vielzahl von Sensoren im System verschiedene Prozessgrössen, unter anderem:
+
+- wie stark die Maschine ausgelastet ist,
+- wie warm ist die Maschine während des Herstellungsprozesses,
+- wie lange der Produktionszyklus eines Werkstücks dauert,
+- auf welcher Maschine und in welcher Schicht produziert wurde.
+
+Diese Daten werden automatisch gespeichert und stehen für Analysen zur Verfügung. In letzter Zeit ist dem Qualitätsmanagement aufgefallen, dass manche Werkstücke deutlich längere Produktionszeiten besitzen als andere.
+
+Unser Datensatz enthält eine Beobachtung pro produziertem Werkstück mit folgenden Variablen/Merkmalen aus dem Zeitraum vom 1.2.2024-3.2.2024:
+
+![Variablen und Merkmale der Daten](images/Variablen_Merkmale.png)
+
+Anm.: Unter Maschinenauslastung in % verstehen wir, dass eine Maschine vorgefertigte Teil angeliefert bekommt und bei 100% permanent ohne Pausen arbeitet. Werden mehr Teile angeliefert, als sie verarbeiten kann treten Wartezeiten auf Die EDA startet für uns schon bei der allerersten Information über die Daten. Bevor wir mit einem Aufräumen oder gar Analyse der Daten starten können, müssen wir zuerst verstehen woher die Daten kommen und wie sie systematisch beschrieben werden.
+
+# Grundbegriffe der Statistik
+
+Um Daten analysieren zu können, benötigt man Grundbegriffe der Statistik. Hier einige Grundbegriffe und deren Definitionen.
+
+- Objekt: Darauf bezieht sich eine statistische Untersuchung (z.B. Person)
+- Grundgesamtheit (Population): Die Menge aller für eine Fragestellung interessierenden statistischen Einheiten. Entscheidend ist eine klare Abgrenzung (z.B. Zeitraum, Ort, Prozess, Produkttyp)
+- Merkmal/Variable: Eine Eigenschaft der statistischen Einheit/Objekt (z.B. Alter, Körpergrösse)
+- Eigenschaften: Die möglichen Werte, die ein Merkmal annehmen kann (z.B. Zahlenwert der Körpergrösse)
+- Stichprobe: Wählt man aus einer Grundgesamtheit nach einem Auswahlverfahren eine Teilmenge, spricht man von einer Stichprobe
+- Urwerte/Primärdaten/Rohdaten: Das sind die beobachteten Werte eines Merkmasls in Grundgesamtheit oder Stichprobe. Fasst man alle Urwerte in einer Liste zusammen, erhält man eine Urliste.
+- Rohdaten: Daten bevor wir irgendeine Modifikation vorgenommen haben. Sie liegen nach einer Messung oder der Erhebung eines Fragebogens vor
+
+Auf unser Beispiel angewendet, würden die Begriffe folgendes bedeuten.
+
+**Statistische Einheit**<br>
+Ein einzelnes produziertes Werkstück (eine Zeile im Datensatz, inkl. seiner Messwerte)
+
+**Grundgesamtheit**<br>
+Alle Werkstücke dieses Produkttyps, die im betrachteten Zeitraum in diesem Produktionsprozess (diesem Werk/dieser Fertigungslinie) produziert werden.
+
+**Stickprobe**<br>
+Die im Datensatz enthaltenen WErkstücke (z.B. die 600 protokollierten Werkstücke).
+
+**Merkmale und Merkmalausprägungen**<br>
+Beispiele:
+
+- Merkmal Shift: Ausprägung ist Morning, Night
+- Merkmal MachineType: Ausprägung ist A, B
+- Merkmal CycleTime: Ausprägung ist z.B. 78 s, 412 s (konkrete Urwerte)
+
+## Merkmalausprägungen
+
+Merkmale/Variablen unterscheiden sich teilweise erheblich. Das Merkmal Farbe kennt nur Merkmalausprägungen wie rot, grün, blau. Hingegen die Leistung des Motors in PS wird numerisch angegeben. 
+
+Eine Ausprägung eines Merkmals wären z.B. die möglichen Werte für das Merkmal "Religionszugehörigkeit". Die Ausprägungen wären z.B. "ohne", "reformiert", "evangelisch". Bei diesen Ausprägungen kann man keine sinnvolle Rangliste im Sinne von das hat Priorität, etc. bringen. Man kann lediglich ihre Häufigkeit zählen. Solche Merkmale nennt man Nominalskaliert. Also für diese Ausprägungen existiert keine sinnvoll interpretierbare Rangordnung. 
+
+Für das Merkmal "Bildungsstand" wären Auspräungen z.B. "niedrig", "mittel", "hoch". Hier ist eine sinnvolle Rangordnung bringen. Das nennt man Ordinalskaliert. Man spricht auch von "ordinalskaliert" oder "rangskaliert".
+
+Für das Merkmal "Anzahl Kinder" sind ganze Zahlen die Ausprägungen. Hierbei können also auch Differenzen gebildet werden.Das würde auch gelten für das Bruttoeinkommen, wobei hierbei die Ausprägungen Kommazahlen sind. Wenn die Bildung von Differenzen möglich ist, nennt man solche Merkmale metrisch- oder kardinalskaliert.
+
+Wichtig sind also die folgenden Bezeichnungen:
+
+- Nominalskala (nominalskaliert)
+- Ordinalskala (ordinalskaliert)
+- Metrische Skala / Kardinalskala (metrischskaliert / kardinalskaliert)
+
+![Skalentypen](images/Skalentypen.png)
+
+## Zusammengefass heisst das für Skalenniveaus
+- Nominalskala: Kategorien ohne natürliche Ordnung, z.B. Farben, Geschlecht etc. → Differenzen/Quotienten nicht sinnvoll.
+- Ordinalskala: Rangordnung, aber Abstände nicht vergleichbar, z.B. Ranglisten im Sport → Differenzen/Quotienten nicht sinnvoll.
+- Metrische Skala: Abstände interpretierbar.
+  - Intervallskala: kein natürlicher Nullpunkt (z. B. °C im Gegensatz zu K (Kelvin mit absolutem Nullpunkt)) → Quotienten nicht sinnvoll.
+  - Verhältnisskala: natürlicher Nullpunkt, z.B. Körpergewicht (negativer Wert nicht sinnvoll); Kelvintemperaturskala → Quotienten sinnvoll (z. B. Zeit).
+  - Absolutskala: Sonderfall mit natürlicher Einheit (z. B. Anzahl).
+
+
+**Merksatz:** Das Skalenniveau entscheidet, welche Operationen (zählen, ordnen, Differenzen, Quotienten) sinnvoll interpretierbar werden können für ein Merkmal/Variable.
+
+## Auf unser Beispiel angewendet
+
+- MachineID: kategorial → nominal
+- MachineType: kategorial → nominal
+- Shift: kategorial → nominal
+- Load: numerisch → metrisch (typisch Verhältnis)
+- Temperature: numerisch → metrisch (oft Intervall bei °C)
+- CycleTime: numerisch → metrisch (Verhältnis)
+- Timestamp: Zeitvariable → Zeitindex
+
+# Weiter im Beispiel
+Die Leiterin der Qualitätssicherung kommt zu uns mit der Feststellung, dass ~7.3% der Fertigungsteile eine Fertigungszeit (CycleTime) über dem Limit von 200 s besitzen. Sie zeigt uns einen kurzen Ausschnitt der Daten und ein Diagramm, das sie Boxplot nennt und gibt uns einen Auftrag.
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+production_data <- read.csv("./data/production_data.csv")
+
+production_data |> dplyr::slice_head(n = 10)
+```
+
+```{r}
+tolerance_cycle <- 200
+
+kpi_oos <- production_data |>
+summarise(
+n_insgesamt     = n(),
+Anzahl_über_Soll      = sum(CycleTime > tolerance_cycle, na.rm = TRUE),
+Prozentpunkte    = 100 * mean(CycleTime > tolerance_cycle, na.rm = TRUE)
+)
+
+kpi_oos
+```
+
+```{r}
+ggplot(production_data, aes(x = "", y = CycleTime)) +
+geom_boxplot() +
+geom_hline(yintercept = tolerance_cycle, linetype = "dashed", color="red") +
+labs(
+title = "CycleTime (Boxplot) mit Toleranzschwelle (gestrichelt)",
+x = "",
+y = "CycleTime (Sekunden)"
+) +
+theme(axis.text.x = element_blank(),
+axis.ticks.x = element_blank())
+```
+
+## Import der Daten und erste Übersicht
+
+> **Erste Forschungsfrage:**<br>
+Wie hängen die ungewöhnlich langen Produktionszeiten von den wichtigsten Prozessgrössen ab und wie kann man sie ggf. reduzieren?
+
+In einem ersten Schritt importieren und sichten wir die Daten.
+
+```{r}
+library(tidyverse)
+
+production_data <- read.csv("./data/production_data.csv")
+str(production_data)
+
+summary(production_data)
+```
+
+Folgendes fällt auf:
+
+- Timestamp, MachineType, MachineID, Shift werden als Wörter (charakters oder strings) importiert.
+- In der Variablen Load fehlen 25 Werte, Temperatur 15 (NA = Not available).
+- Negative Werte für Load
+
+## Datenreinigung/Aufräumen (tidy)
+Wie können wir diese Anomalien und Unzulänglichkeiten in unseren Daten bereinigen? Hierfür verwenden wir die moderne Datenreinigungsbibliothek dplyr. Damit wir grob dem Code folgen können, schauen wir uns nur kurz die Logik hinter den pipelines von dplyr und die wichtigsten Befehle an, die wir verwenden. Die Ausführlichere Behandlung behalten wir in einem Tutorial in der Nachbereitung zu dieser Einführung.
+
+Die Grundidee: Wir lesen die Datenreinigung als Abfolge von Schritten – von links nach rechts.
+
+- Pipe %>%: Nimmt das Ergebnis links und gibt es als erstes Argument an die Funktion rechts weiter.
+→ Dadurch wirkt Code wie ein „Arbeitsablauf“: Daten → Schritt 1 → Schritt 2 → …
+- Wichtig: dplyr verändert Daten nicht automatisch „in place“.
+Wenn du das Ergebnis behalten willst, musst du es wieder zuweisen:
+production_data <- production_data %>% ...
+
+Befehle, die wir gleich verwenden:
+
+- mutate(...): Spalten verändern/neu erstellen (z. B. Werte ersetzen, neue Variablen berechnen).
+- across(c(...), FUN): Wendet eine Funktion auf mehrere Spalten gleichzeitig an (z. B. as.factor).
+- ifelse(Bedingung, dann, sonst): Bedingtes Ersetzen, z.
+  - negative Werte zu NA.
+- recode(Spalte, "alt" = "neu"): Tippfehler/Labels korrigieren durch Wert-Mapping.
+  - count(Spalte): Zählt Häufigkeiten der Ausprägungen (praktisch zum Prüfen nach dem recode).
+- drop_na(): Entfernt alle Zeilen mit fehlenden Werten (NA) – ergibt einen „sauberen“ EDA-Datensatz.
+- summary(...): Schneller Plausibilitätscheck (Typen, Min/Max, Anzahl NAs, Levels bei Faktoren).
+
+Was ist zu tun? Wir müssen die Typen der Variablen anpassen, in dem wir R genau sagen, welche Typen wir erwarten. Negative Werte beim `Load` setzen wir auf NA (not available).
+
+```{r}
+production_data <- production_data %>%
+  mutate(
+    across(c(MachineID, MachineType, Shift), as.factor),
+    Load = ifelse(Load<0, NA, Load)
+  )
+summary(production_data)
+```
+
+Jetzt sehen wir, dass sie sog. kategorialen Variablen sind, wie wir es erwartet haben. Beider Variablen Shift finden wir 15 Tippfehler: Ngt, statt Night.
+
+Nächster Schritt:
+
+- Tippfehler korrigieren
+- Timestamp in das richtige Format übertragen.
+- Fehlende Daten anschauen
+
+```{r}
+production_data <- production_data %>%
+  mutate(
+    Shift = dplyr::recode(Shift, "Nigt" = "Night")
+  )
+
+production_data %>% count(Shift) #Hier zählen wir alle Ausprägungen von Shift und Ngt sollte verschwunden sein.
+
+
+# Umwandung in eine kategoriale Variable; R identifiziert die "levels" von selbst
+production_data <- production_data %>% 
+  mutate(
+    across(c(MachineID, MachineType, Shift), as.factor),
+    Timestamp   = as.POSIXct(Timestamp, format = "%Y-%m-%d %H:%M:%S")
+  )
+
+# Formatanpassung für das Datumsformat
+summary(production_data)
+```
+
+Auch bei Timestamp fehlen zwei Werte.
+
+Was macht man mit fehlenden Werten? Sie treten auf, weil z.B. ein Sensor ausfällt oder ein Messwert nicht gespeichert wurde. Die radikale Methode besteht darin, alle Datenpunkte mit Lücken zu verwerfen. Das ist aber oftmals gleichbedeutend mit dem Verlust grosser Informationsmengen und nicht erwünscht.
+
+Wie sieht es bei uns aus? Es fehlen gerade einmal 30 von 600, d.h. 5%. Das ist nicht ideal, aber meist vertretbar. Wir generieren einen neuen Datensatz, der alle NAs ausblendet, d.h. alle Zeilen im Dataframe gelöscht hat.
+
+```{r}
+eda_data <- production_data %>% drop_na()
+summary(eda_data)
+```
+
+Wir haben es geschafft! Die Daten sind soweit aufbereitet und gereinigt, dass wir mit der EDA richtig loslegen können.
+
+
+# Visualisierungen
+Mit ggplot2 machen wir für dieses Übung Visualisierungen.
+
+Die Grundidee: ggplot2 baut eine Grafik schichtweise auf – wie ein transparentes Folien-Overlay.
+Man startet mit Daten + Zuordnung (aes) und fügst dann Geometrien (Punkte, Balken, Boxen …) und Optionen (Skalen, Labels, Theme) als Layers hinzu.
+
+1) Der „Kern“: Daten + Aesthetics (aes) - ggplot(data, aes(...)) definiert: - welcher Datensatz verwendet wird (data) - welche Variablen auf welche grafischen Rollen abgebildet werden (aes)
+
+Typische Zuordnungen in aes(...): - x = ... / y = ... → Achsen - color = ... → Linien-/Punktfarbe (nach Kategorie oder Wert) - fill = ... → Flächenfüllung (z. B. Balken, Boxen) - group = ... → Gruppierung (wichtig bei Linien/Boxplots) - alpha = ... / size = ... → Transparenz / Grösse (selten als Mapping nötig)
+
+**Wichtig:**<br>
+- Mapping gehört in aes(...) (wenn eine Variable etwas steuert).
+- Konstante Einstellungen gehören ausserhalb von aes(...) (z. B. alpha = 0.4 für alle Punkte).
+
+** 2) Die „Layers“: Geometrien (geom_*) Eine Grafik wird erst sichtbar, wenn du mindestens eine Geometrie** hinzufügst:
+
+- geom_point() → Streudiagramm (Punkte)
+- geom_histogram() → Histogramm (Verteilung)
+- geom_boxplot() → Boxplot (Lage + Streuung + Ausreisser)
+- geom_bar() → Balken (Kategorien zählen)
+- geom_line() → Linien (Zeitverlauf/Trend)
+- geom_smooth() → Trendlinie/Glättung (optional)
+
+Du „liest“ den Code dann so: > Grundplot (Daten + aes)<br>
+> + eine Geometrie (wie wird gezeichnet?)<br>
+> + weitere Layer (z. B. Referenzlinien, Facets, Labels)
+
+3) Statistiken unter der Haube (stat) Viele Geoms berechnen intern etwas: - geom_histogram() → zählt Werte in Bins - geom_boxplot() → berechnet Quartile, IQR, Ausreisser-Regel - geom_bar() → zählt Kategorien (wenn nur x gegeben ist)
+
+Das ist wichtig, weil: Manchmal plotten wir nicht Rohdaten, sondern eine Zusammenfassung, die ggplot intern berechnet.
+
+4) Skalen & Koordinaten: „Zoom“ vs. „abschneiden“ - coord_cartesian(ylim = ..., xlim = ...) → Zoomt, ohne Daten zu entfernen (empfohlen zum „Reinzoomen“). - scale_x_continuous(limits = ...) / scale_y_continuous(limits = ...) oder xlim()/ylim() → entfernt Werte ausserhalb (kann z. B. Ausreisser verschwinden lassen).
+
+5) Aufteilen in mehrere kleine Grafiken: facet_* - facet_wrap(~ Shift) → eine Grafik pro Ausprägung (z. B. pro Schicht) - facet_grid(MachineType ~ Shift) → Matrix aus Teilgrafiken
+
+Facets sind zentral für die EDA, weil sie Vergleiche sehr leicht machen.
+
+6) „Politur“: Labels & Theme - labs(title=..., x=..., y=..., color=..., fill=...) → Beschriftungen - theme_minimal() / theme_bw() / theme(...) → Darstellung/Design - guides(...) / legend.position = ... → Legende steuern (optional)
+
+**Merksatz zum Lesen von ggplot-Code:**<br>
+> ggplot(...) sagt worum es geht (Daten + Rollen).<br>
+> geom_*() sagt wie es aussieht (Darstellung).<br>
+> facet_*(), coord_*(), scale_*(), theme_*(), labs() machen es vergleichbar und lesbar.
+
+## Visualisierungen I - Kategoriale Variablen mit Barplots (Stäbchendiagramme)
+Bevor wir die Zusammenhänge zwischen numerischen Variablen analysieren (z. B. CycleTime vs. Load), müssen wir zuerst verstehen, wie unsere Daten “zusammengesetzt” sind. Ein grosser Teil unseres Datensatzes besteht aus kategorialen Variablen wie Shift, MachineType oder MachineID. Diese Variablen beschreiben keine Messwerte auf einer Skala, sondern Gruppen bzw. Kategorien. Wenn wir später Aussagen über die numerischen Merkmale von Gruppen oder Kategorien treffen wollen, müssen wir brücksichtigen, ob sie angemessen im Datensatz repräsentiert sind. Haben wir z.B. kaum Daten für eine Frühschicht, dafür viele Daten über die Nachtschicht, werden wir kaum zuverlässige Einsichten gewinnen.
+
+> Zweite Forschungsfrage Wie häufig kommt jede Kategorie vor? Sind alle Gruppen ausreichend vertreten – oder dominiert eine einzelne Kategorie?
+
+Warum ist das wichtig?
+Wenn z.B.70% aller Werkstücke in der Morning-Schicht produziert wurden, dann prägt diese Schicht automatisch die Verteilung von CycleTime. Ebenso können scheinbare Effekte entstehen, wenn ein Maschinentyp viel häufiger vorkommt als der andere. Bevor wir also Gruppen vergleichen (z. B. Boxplots pro Schicht) oder Zusammenhänge interpretieren, prüfen wir zuerst die Häufigkeiten der Kategorien.
+
+Genau dafür verwenden wir Balkendiagramme (Barplots), welche wir uns als erstes ansehen.
+
+**Übrigens**: Balkendiagramme sind das Standardwerkzeug für kategoriale Variablen.
+
+- Normaler Barplot: Häufigkeiten pro Kategorie (z.B. wie viele Werkstücke pro Schicht?)
+- Gruppierter Barplot: Vergleich innerhalb einer Kategorie (z.B. Maschinentyp A vs. B je Schicht)
+
+Vergleich der verschiedenen Schichten:
+
+```{r}
+ggplot(eda_data, aes(x = Shift)) +
+  geom_bar(fill = "lightblue", color = "white") +
+  labs(
+    title = "Anzahl Werkstücke pro Schicht",
+    subtitle = "Datenbalance der kategorialen Variable Shift",
+    x = "Shift",
+    y = "Anzahl"
+  ) +
+  theme_minimal()
+```
+
+Wir sehen Unterschiede, aber sie sind nicht sehr gross. Nur die Morning Schicht stellt ca. 15% mehr Werkstücke her als die beiden anderen => keine Auffälligkeiten.
+
+Neben den Schichten gibt es noch verschiedene Maschinentypen, die vielleicht unterschiedliche Anzahl Werkstücke produzieren. Dies können wir durch einen Gruppenbarplot darstellen, der die gerade gezeigten Blöcke ergänzt.
+
+```{r}
+ggplot(eda_data, aes(x = Shift, fill = MachineType)) +
+  geom_bar(position = "dodge", color = "white") +
+  labs(
+    title = "Werkstücke nach Schicht und Maschinentyp",
+    subtitle = "Gruppierter Barplot: Vergleich A vs. B innerhalb jeder Schicht",
+    x = "Shift",
+    y = "Anzahl",
+    fill = "MachineType"
+  ) +
+  theme_minimal()
+```
+
+Typ A proudziert in der Evening Schicht weniger als Typ B. Dafür aber in der Night Schicht mehr als Typ B. In der Morning Schicht gibt es keine Unterschiede. Daher sind keine Auffälligkeiten zu sehen, die gross genug sind, um von unausgewogenen Daten sprechen zu können.
+
+>Fazit Visualisierungen I:<br>
+Die Gruppen sind gut vergleichbar: Jede Schicht enthält genügend Beobachtungen, und die Maschinentypen A/B sind innerhalb der Schichten ähnlich häufig.
+Damit sind Vergleiche wie Boxplots oder Scatterplots nach Shift und MachineType sinnvoll, ohne dass ein offensichtliches Ungleichgewicht die Ergebnisse verzerrt.
+
+## Visualisierungen II - Histogramme und Boxplots
+
+Nachdem wir uns vergewissert haben, dass wir in allen Kategorien genügend Messwerte besitzen, fragen wir jetzt:
+
+> Dritte Forschungsfrage: Wie treten die Produktionszeiten hinsichtlich ihrer Häufigkeit auf?
+
+Dazu fertigen wir ein sog.Histogramm an.
+
+```{r}
+ggplot(eda_data, aes(x = CycleTime)) +
+  geom_histogram(bins = 25, fill = "steelblue", color = "white") +
+  labs(
+    title = "Histogramm der Produktionszeiten",
+    x = "CycleTime (Sekunden)",
+    y = "Häufigkeit"
+  )
+```
+
+Dazu können wir uns vorstellen, dass wir die Messwerte der Grösse nach anordnen und sie dann in vorgegebene Grössenintervallen zuordnen. Jedes Intervall bekommt einen Balken und die Höhe des Balkens entspricht der Anzahl Messwerte in seinem Intervall. Wir sehen, dass die grosse Mehrheit der Produktionszeiten auf nur zwei Balken um 0-100 Sekunden verteilt sind und einige wenige grosse Ausreisser existieren. Schauen wir uns den Code an (die Details der Syntax sehen wir uns nach der Visualisierung genauer an), so finden wir mit bins die Anzahl der Intervalle oder “Eimer” in die die Daten aufgeteilt werden. Vielleicht ist unsere Darstellung zu grob, d.h. es gibt noch interessante Informationen innerhalb der bins. Ausserdem wollen wir den Einfluss der Ausreisser mit sehr geringer Häufigkeit für einen Moment ausblenden und beschränken die Werte für CycleTime auf 500.
+
+### Histogramme und Anzahl der Bins
+Die Anzahl bins bestimmt, wie grob oder fein das Histogramm die Verteilung darstellt – die Daten bleiben gleich, aber die sichtbare Struktur ändert sich.
+
+- Sehr wenige Bins: Das Histogramm wirkt glatt und grob. Wichtige Details (z. B. kleine Peaks oder Knicke) können untergehen.
+- Mittlere Bin-Anzahl (z. B. 24–50): Guter Kompromiss: Form der Verteilung (Schiefe, Ausreisser, Häufungen) ist meist gut erkennbar und noch gut lesbar.
+- Sehr viele Bins: Das Histogramm wird zackig. Man sieht viel “Struktur”, aber ein Teil davon ist oft Zufallsrauschen → Gefahr der Überinterpretation.
+
+**Fazit:** Mit bins spielen hilft zu prüfen, ob Muster stabil sind oder nur durch die Darstellung entstehen.
+
+```{r}
+library(patchwork)
+eda_data_500 <- eda_data %>% filter(CycleTime<500)
+
+# 1. Plot: bins = 24 nach Faustregel
+p1 <- ggplot(eda_data_500, aes(x = CycleTime)) +
+  geom_histogram(bins = 24, fill = "steelblue", color = "white") +
+  labs(
+    title = "bins = 24",
+    subtitle = "nach Faustregel",
+        x = "CycleTime",
+    y = "Häufigkeit"
+  )
+
+# 2. Plot: Filtern mit xlim (Daten > 1000 werden gelöscht)
+p2 <- ggplot(eda_data_500, aes(x = CycleTime)) +
+  geom_histogram(bins = 50, fill = "indianred", color = "white") +
+  labs(
+    title = "bins = 50",
+    x = "CycleTime",
+    y = "Häufigkeit"
+  )
+
+# 3. Plot: `bins`= 200
+p3 <- ggplot(eda_data_500, aes(x = CycleTime)) +
+  geom_histogram(bins = 100, fill = "indianred", color = "darkgreen") +
+  labs(
+    title = "bins = 100",
+    x = "CycleTime",
+    y = "Häufigkeit"
+  )
+# Beide nebeneinander anzeigen
+p1 + p2 + p3
+```
+
+### Histogramm: Verteilungen sehen
+
+Wofür?<br>
+- Form der Verteilung erkennen: schief? mehrere Gipfel? lange Schwänze? - Grobe Häufigkeiten/Cluster sichtbar machen
+
+Wichtigste Eigenschaften - Zeigt Häufigkeiten in Klassen (Bins).<br>
+- Ergebnis hängt von bins / binwidth ab (zu grob/zu fein kann täuschen). Als Fausformel zur sinnvollen Anzahl bins kann man sich in der Praxis an die Fausformel halten:
+
+$$
+\text{bins} \approx \sqrt{n}, \quad n = \text{Anzahl Messwerte}
+$$
+
+
+- Ausreisser sind nicht als Punkte markiert, sondern „stecken“ in seltenen Bins am Rand.
+
+Wenn man in der Praxis viele Klassen besitzt, die nur eine sehr kleine Anzahl von Datenpunkten enthalten, kann es sinnvoll sein statt bins gleicher Intervalllänge besser unterschiedliche Länge zu benutzen. Dabei muss man aber vorsichtig sein, den optischen Eindruck nicht zu verfälschen.
+
+### Histogramme mit ungleich breiten Klassen: Höhe nicht-gleich Häufigkeit!
+
+Normalerweise sind Histogramm-Klassen (Bins) gleich breit. Dann gilt: Höhe des Balkens ∝ Häufigkeit.
+
+Es gibt aber auch den Fall, dass es sinnvoll ist Klassenbreiten ungleich zu wählen.
+
+**Warum überhaupt ungleiche Klassenbreiten?**
+
+Auf den ersten Blick wirkt es widersprüchlich: Ungleiche Klassenbreiten machen das Histogramm komplizierter, weil die y-Achse dann eine Dichte statt einer einfachen Häufigkeit zeigt. Trotzdem sind ungleiche Klassenbreiten in der Praxis manchmal genau das Richtige.
+
+Wann ist das sinnvoll?
+
+- **Sehr schiefe Verteilungen / lange tails:**<br>
+Wenn die Daten einen dichten Bereich (z. B. 0–200 s) und gleichzeitig wenige extreme Ausreisser (z. B. bis 2000 s) haben, dann sind gleich breite Bins oft ein schlechter Kompromiss:
+Entweder sind die Bins im dichten Bereich zu grob oder der tail dominiert die Achse.
+
+- **Mehr Auflösung dort, wo die Daten „passieren“:**<br>
+In Bereichen mit vielen Beobachtungen wählt man schmale Bins, um Struktur zu sehen.
+Im Tail wählt man breitere Bins, um seltene Werte kompakter zu gruppieren.
+
+- **Interpretation bleibt korrekt über Flächen:**<br>
+Auch wenn die y-Achse eine Dichte zeigt, bleibt die wichtigste Aussage erhalten:
+Die Fläche eines Balkens entspricht der Häufigkeit.
+Damit kann man trotz unterschiedlicher Breiten fair vergleichen.
+
+**Mathematischer Hintergrund**<br>
+Würde man einfach die Bins breiter machen, hätte diese „mehr Fläche“ und wirkt optisch häufiger falsch.
+
+Regel: Bei ungleichen Klassen muss die Fläche eines Balkens die Häufigkeit repräsentieren.
+
+Dazu verwendet man die Häufigkeitsdichte (Density):
+
+$$
+\text{Häufigkeitsdichte im Bin } j
+\;=\;
+\frac{\text{Häufigkeit im Bin } j}{\text{Klassenbreite } w_j}
+$$
+
+Dann gilt wieder:
+
+$$
+\underbrace{\text{Fläche}}_{\text{Höhe }{\cdot w_j}}
+\;=\;
+\left(\frac{\text{Häufigkeit}}{w_j}\right)\cdot w_j
+\;=\;
+\text{Häufigkeit}
+$$
+
+**Merksatz:** Bei ungleich breiten Bins liest man Flächen, nicht Balkenhöhen.
+
+In R/ggplot2 (Density statt Count):
+
+```{r}
+library(patchwork)
+library(ggplot2)
+
+# 1) Standard-Histogramm (gleich breite Bins)
+p_equal <- ggplot(eda_data, aes(x = CycleTime)) +
+  geom_histogram(bins = 25, fill = "steelblue", color = "white") +
+  labs(
+    title = "Standard-Histogramm ",
+    subtitle = "gleich breite Bins",
+    x = "CycleTime (Sekunden)",
+    y = "Häufigkeit"
+  ) +
+  theme_minimal()
+
+# 2) Histogramm mit ungleichen Klassenbreiten (Dichte statt Count!)
+breaks_unequal <- c(0, 50, 100, 200, 500, 2000)
+
+p_unequal <- ggplot(eda_data, aes(x = CycleTime)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    breaks = breaks_unequal,
+    fill = "indianred",
+    color = "white"
+  ) +
+  labs(
+    title = "Ungleiche Klassenbreiten",
+    subtitle = "Fläche proportional Häufigkeit",
+    x = "CycleTime (Sekunden)",
+    y = "Dichte (Häufigkeit / Klassenbreite)"
+  ) +
+  theme_minimal()
+
+# Nebeneinander
+p_equal + p_unequal
+```
+
+Der optische Eindruck ist zwar ähnlich, aber mit ungleichen Bins wird hervorgehoben, dass die sehr viele Messwerte in einem schmalen Intervall konzentriert sind (höchste Dichte).
+
+### Deskriptive Kennzahlen: Zahlen zum Histogramm
+Der visuelle Eindruck, wie die Datenwerte verteilt sind liefert uns schon viele wichtige Informationen. In der Praxis wollen wir aber häufig auch quantitative Kennwerte, die kompelementär die visuellen Informationen ergänzen. Sie nennen wir in der Statistik und im Data Science Metriken oder Kennzahlen.
+
+**Lage (typischer Wert)**
+
+- Arithmetisches Mittel: "Durchschnitt" - Jede Beobachtung zählt gleich stark
+- Median: "Die Mitte" - 50% der Werte liegen darunter, 50% darüber - Robust gegenüber Ausreissern
+- Modus: "Der häufigste Wert" - die höchste Säule im Histogramm
+  - Bei kategorialen Daten ist der Modus oft die wichtigste Lagekennzahl.
+  - Bei metrischen Daten wird der Modus im Histogramm meist als häufigstes Intervall sichtbar und hängt daher von der Wahl der bins ab.
+  - Eine Verteilung kann mehrere Modi haben (bimodal / multimodal), z. B. wenn zwei Gruppen gemischt sind.
+
+**Streuung (wie stark variieren die Werte?)**
+
+- Varianz / Standardabweichung: Typische Abweichung vom Mittelwert - weil quadriert wird, wirken Ausreisser stark mit
+- Spannweiter: Gesamte Breite der Daten - sehr empfindlich gegenüber Ausreissern (ein einziger Extremwert reicht)
+
+**Schiefe (Form der Verteilung - grober Schnelltest)**
+
+- Mittelwert vs. Median: Extreme grosse Werte ziehen den Mittelwert nach rechts (oben); der Median bleibt „in der Mitte“. Man kann deshalb sagen, der Median ist robuster gegen Ausreisser als der arithm. Mittelwert.
+  - rechtsschief: langer rechtes Ende der Verteilung (tail)
+  - linksschief: langer linker Ende der Verteilung (tail)
+  
+## Weiter mit unserem Beispiel
+Bestimmen wir jetzt diese Lage- und Streumasse/-kennwerte unserer Daten:
+
+```{r}
+eda_data %>%
+  summarise(
+    Mean   = mean(CycleTime, na.rm = TRUE),
+    Median = median(CycleTime, na.rm = TRUE),
+    SD     = sd(CycleTime, na.rm = TRUE),
+    IQR    = IQR(CycleTime, na.rm = TRUE),
+    Min    = min(CycleTime, na.rm = TRUE),
+    Max    = max(CycleTime, na.rm = TRUE)
+  )
+```
+
+Was lernen wir aus diesen Metriken über die Verteilung der Messwerte?
+
+1. Der Wert des Medians, $\tilde{x}$, liegt viel tiefer als der arithm. Mittelwert/mean, $\bar{x}$. Dies sagt uns, dass die Verteilung rechtsschief ist, d.h. sie besitzt mehr Datenwerte unterhalb von $\bar{x}$, als oberhalb => Verteilung ist nicht symmetrisch; Der Grund ist, das wir hier einige Ausreisser haben mit hohen Messwerten, die den Wert von $\bar{x}$ nach oben ziehen. Der Median ist hier viel robuster und weitgehend unberührt von den Ausreissern.
+2. Max zeigt uns, dass es sehr grosse Ausreisser gibt, während Min nur knapp unter $\bar{x}$ liegt.
+3. Im Histogramm mit der höheren Anzahl bins können wir nur sehr grob schätzen, wo $\bar{x}$ und $\tilde{x}$ liegen. Die mathematischen Definition geben uns quantitative Werte, dies auch erlauben Verteilungen nach ihren Metriken zu vergleichen.
+
+Das Histogramm hat uns schon wertvolle Hinweise über CycleTimegeliefert, jetzt möchte wir aber die Häufung der Messwerte aus einer anderen Perspektive betrachten. Deshalb plotten wir alle Punkte vertikal übereinander.
+
+```{r}
+ggplot(eda_data, aes(x = 0, y = CycleTime)) +
+  geom_point(alpha = 0.4, color = "blue") +
+  labs(
+    title = "Produktionszeiten (alle Punkte übereinander)",
+    x = "",
+    y = "CycleTime (Sekunden)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+Wir sehen, dass die wenigen Ausreisser die Darstellung dominieren und wir so kaum eine Information erhalten über die grosse Mehrheit der Datenpunkte. Wir limitieren deshalb die Werte für CycleTime wieder auf 500 Sekunden. Um die Verteilung der Datenpunkte besser zu sehen, führen wir eine statistische Abweichung in den Plot ein (sog. jitter).
+
+```{r}
+set.seed(42)  # für reproduzierbare Jitterwerte
+
+# Ein Jitter-Vektor um x = 1, den wir mehrfach verwenden
+j <- jitter(rep(1, nrow(eda_data_500)), amount = 0.1)
+
+eda_data_kurz <- eda_data_500 %>%
+  mutate(
+    x_col      = 0,      # Punkte ohne Jitter
+    x_jitter   = j,      # Punkte mit Jitter (Zentrum ~1)
+    x_boxjit   = j + 1   # gleiche Punkte, nach rechts verschoben (Zentrum ~2)
+  )
+
+ggplot(eda_data_kurz, aes(y = CycleTime)) +
+  # 1) LINKS: Punkte alle exakt übereinander (kein Jitter)
+  geom_point(aes(x = x_col), alpha = 0.4, color="blue") +
+  
+  # 2) 2. Spalte: nur Jitter
+  geom_point(aes(x = x_jitter),color="blue", alpha = 0.4) +
+  
+  # 3) 3. Spalte: Boxplot + die gleiche Punktwolke
+  geom_boxplot(
+    aes(x = 2),
+    width = 0.4,
+    fill = "grey60",
+    color = "black",
+    outlier.shape = 1
+  ) +
+  geom_point(aes(x = x_boxjit),color="blue", alpha = 0.3, size = 1) +
+  
+  # 4) 4. Spalte: nur Boxplot
+  geom_boxplot(
+    aes(x = 3),
+    width = 0.4,
+    fill = "grey60",
+    color = "black",
+    outlier.shape = 1
+  ) +
+  
+  scale_x_continuous(
+    breaks = c(0, 1, 2, 3),
+    labels = c(
+      "Punkte (ohne Jitter)",
+      "Punkte (Jitter)",
+      "Box + Punkte",
+      "Boxplot"
+    )
+  ) +
+  labs(
+    title = "Vier Sichten auf dieselben Produktionszeiten",
+    x = "",
+    y = "CycleTime (Sekunden)"
+  ) +
+  theme_minimal()
+```
+
+Ohne Jitter sehen wir nur einen Strich aus Punkten.Der Jitter gibt uns einen Einblick in die Dichte, mit der die Messwerte auftreten. Mit der grauen Box führen wir jetzt eine kompakte Visualisierung wichtiger Eigenschaften der Messwerte (man sagt auch univariate Daten) ein: Den Boxplot.
+
+> Wofür? Kompakter Überblick über Lage und Streuung; ideal zum Vergleich von Gruppen.
+>
+> Wichtigste Eigenschaften
+>
+> Box = Q1 bis Q3 (IQR), Linie in der Box = Median = 
+>
+> Whisker bis zum letzten Wert innerhalb 1.5·IQR
+>
+> Werte ausserhalb sind Ausreisser und werden standardmässig als Kringel oder Punkte geplottet
+>
+> Q steht für Quartile, von lat. quartus, der Vierte, hier “ein Viertel” (wie in Stadtviertel). Wenn ich 100 Messwerte der Grösse nach anordne und durchnummeriere, dann wäre die 1.Quartile der Wert des 25.Messwerts, die 2.Quartile (sog. Median) der des 50. und die 3.Quartile der 75.Messwert.
+>
+> Q1: 1.Quartile
+> Q3: 3.Quartile
+>IQR: Interquartile distance
+
+Die Quartilen können wir natürlich auch als Kennwerte direkt aus den Daten mit R berechnen:
+
+```{r}
+eda_data_500 %>%
+  summarise(
+    Q1     = quantile(CycleTime, 0.25, na.rm = TRUE),
+    Median = median(CycleTime, na.rm = TRUE),
+    Q3     = quantile(CycleTime, 0.75, na.rm = TRUE),
+    IQR    = IQR(CycleTime, na.rm = TRUE),
+    Mean   = mean(CycleTime, na.rm=TRUE)
+  )
+```
+
+Die vertikalen Striche, Whisker haben die Länge von 1.5*Boxlänge(=IQR) und dient dazu pragmatisch die Ausreisser zu definieren, die jenseits dieser Striche liegen und als Kringel eingezeichnet werden.Wir sehen, dass schon bei Werten über ca.170 die Ausreisser nach dieser Definition beginnen. Wir erinnern uns an die Aussage der Leiterin der Qualitätssicherung, dass Werte unter 200 Sekunden in Ordnung sind und dass die grosse Mehrheit diese Bedingung erfüllen. Dies sehen wir mit einem Blick auf den Boxplot. Wir müssen uns also auf die Ausreisser konzentrieren. Was aber ist charakteristisch für diese Ausreisser? Treten Sie nur bei hoher Last oder nur in einer bestimmten Produktionschicht auf?
+
+Wir entscheiden uns für die Abhängigkeit der Produktionszeit von der Last.
+
+> Vierte Forschungsfrage: Tritt für hohe Produktionszeit auch ein hoher Wert der Last auf?
+
+## Visualisierungen III - Streudiagramme - side-by-side Boxplots
+
+Um die Abhängigkeit der beiden Variablen sichtbar zu machen, plotten wir sie in ein sog. Streudiagramm (scatter plot).
+
+```{r}
+ggplot(eda_data, aes(x = Load, y = CycleTime)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "Produktionszeit in Abhängigkeit von der Maschinenlast",
+    x = "Load (%)",
+    y = "CycleTime (Sekunden)"
+  )
+```
+
+Die Last (Load) nimmt qualitativ ab ca. 25% langsam zu und zeigt einen “Knick”, d.h. steileren Anstieg ab ca. 75%. Das wollen wir aber etwas genauer ansehen und plotten nochmals, aber nur bis zu Werten von 500 um den Einfluss der Aureisser zu begrenzen:
+
+```{r}
+ggplot(eda_data_500,
+       aes(x = Load, y = CycleTime)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "Produktionszeit in Abhängigkeit von der Maschinenlast (≤ 500 s)",
+    x = "Load (%)",
+    y = "CycleTime (Sekunden)"
+  )
+```
+
+Hier sehen wir jetzt den “Knick” ausgeprägter und stellen fest, dass ab ca. 80% Last der erlaubte Grenzwert von 200% überschritten wird. Nun wissen wir, dass der Lastanstieg zu höheren Produktionszeiten führt, aber nicht, ob auch andere Variablen Einfluss auf die Last haben. Besteht vielleicht ein Zusammenhang mit der (Betriebs)Temperatur der Maschine?
+
+> Fünfte Forschungsfrage: Sehen wir einen Zusammenhang zwischen CycleTime und temperature?
+
+```{r}
+ggplot(eda_data, aes(x = CycleTime, y = Temperature)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  labs(
+    title = "Produktionszeit in Abhängigkeit von der Temperatur",
+    y = "Temperature (°C)",
+    x = "CycleTime (Sekunden)"
+  )
+```
+
+Hier sehen wir Cluster von Datenpunkten, die aber kaum eine nennenswerte Erhöhung der Temperatur in Abhängigkeit von der Produktionszeit zeigen. Nur zwei Ausreisser bei 200°C sind sichtbar, dies müsste man genau ansehen, sind in der Anzahl aber so gering, dass wir für den Moment darauf verzichten.
+
+Was lernen wir daraus? Wir sehen, dass die Temperatur kaum eine Abhängigkeit von der Last zeigt, von den beiden Ausreissern abgesehen. Man hätte eher erwartet, dass bei hoher Last eine erhöhte Arbeitstemperatur zeigt, was hier verneint werden kann. Kommen wir nochmals zum nichtlinearen Zusammenhang zwischen CycleTime und Load zurück. Zwei mögliche Abhängigkeiten haben wir noch nicht betrachtet.
+
+> Sechste und siebte Forschungsfrage:<br>
+- Hängen die Produktionszeiten von der Schicht ab? (anderes Personal, weniger Überwachung der Prozesse etc.) - Verhalten sich die Maschinentypen unterschiedlich
+
+Beginnen wir mit der Schicht. Hierfür schauen wir uns die Boxplots aufgeteilt nach Schicht an mit logarithmierten Zeiten um die Dominanz der Ausreisser zu minimieren:
+
+```{r}
+ggplot(eda_data, aes(x = Shift, y = log(CycleTime))) +
+  geom_boxplot(fill = "skyblue") +
+  labs(title = "Produktionszeiten nach Schicht")
+```
+
+Das Logarithmieren ist generell eine Methode um entweder Nichtlinearitäten oder extreme Ausreisser in ihrer Wirkung einzuschränken. Wir sehen in allen drei Schichten Ausreisser, am wenigsten extrem in der Nacht. Sonst gibt es wenige Auffälligkeiten. Bleibt noch der Maschinentyp.
+
+```{r}
+ggplot(eda_data_500, aes(x = MachineType, y = CycleTime)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(
+    title = "Produktionszeiten nach Maschinentyp",
+    x = "Maschinentyp",
+    y = "CycleTime (Sekunden)"
+  )
+```
+
+Hier wurden wieder alle Werte von CycleTime>500 vernachlässigt um die Boxen besser zu sehen. Maschinentyp B liegt bei tieferen Produktionszeiten, beide zeigen jedoch viele Werte über 200. Auch hier kein Rückschluss auf den Anstieg. Aber, wir wollen sehen, ob der “Knick” zu verschiedenen Lasten auftrit, je nach Maschinentyp. Dies ist ein side-by-side Boxplot, d.h. mehrere nebeneinander, z.B. für die verschiedenen Kategorien eine kategorialen Variable, wie hier des Maschinentyps.
+
+```{r}
+p3<-ggplot(eda_data, aes(x = Load, y = CycleTime, color = MachineType)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "CycleTime ~ Load (nach Maschinentyp)",
+    x = "Load (%)",
+    y = "CycleTime (Sekunden)",
+    color = "Maschinentyp"
+  ) +
+  theme_minimal()
+
+p4<-ggplot(eda_data_500, aes(x = Load, y = CycleTime, color = MachineType)) +
+  geom_point(alpha = 0.6) +
+  labs(
+    title = "CycleTime ~ Load (nach Maschinentyp)",
+    x = "Load (%)",
+    y = "CycleTime (Sekunden)",
+    color = "Maschinentyp"
+  ) +
+  theme_minimal()
+plot(p3 + p4)
+```
+
+Beide Maschinentypen folgen -bis auf wenige Ausreisser- der gleichen Abhängigkeit und der Knick erfolgt leicht oberhalb von 75%.
+
+Kommen wir zur Diskussion und Interpretation, was wir aus der EDA bisher gelernt haben.
+
+# Diskussion und Interpretation
+- Histogramm und Boxplots: Aus dem Histogramm und den Boxplots haben wir gelernt, dass die Produktionszeiten ab ca. 75% Last den Grenzwert von 200s überschreiten, diese Phänomen aber weder von der Schicht oder dem Maschinentyp abhängt.
+- Streudiagramm Ab ca. 75% Last steigen die Produktionszeiten deutschlich schneller an als zwischen 0%-75%.
+
+Wir wissen jetzt, dass wir uns auf diesen stärkeren Anstieg konzentrieren müssen um zu verstehen, wo die Ursache des Problems liegt.
+
+## Interpretation (Last = Auslastung → Warteschlange → CycleTime)
+Um ein tieferes Verständnis des Problems zu erlangen müssen wir die Variablen CycleTime und Load besser im Kontext verstehen. Dazu haben wir im Bereich der Fertigungstechnik recherchiert und aus der Literatur folgende Einsichten gewonnen.
+
+In unserem Produktionsprozess ist CycleTime nicht nur die reine Bearbeitungszeit eines Werkstücks. Sie setzt sich zusammen aus
+
+$$
+\text{CycleTime} = \text{Bearbeitungszeit} + \text{Wartezeit}.
+$$
+
+Genau deshalb ist die Variable Load hier entscheidend: Wir interpretieren Load als Auslastung der Maschine bzw. des Systems (wie „voll“ das System gerade ist).
+
+**Warum führt hohe Last zu stark steigenden CycleTimes?**
+
+Das ist ein klassischer Effekt aus der Warteschlangentheorie:
+
+- Bei niedriger Auslastung werden Werkstücke praktisch sofort bearbeitet. => Wartezeiten sind klein, CycleTime ist nahe an der Bearbeitungszeit.
+- Je näher die Auslastung an 100% kommt, desto häufiger müssen neue Werkstücke warten, weil die Maschine gerade beschäftigt ist. => Die Wartezeit wächst überproportional.
+
+Die zentrale Einsicht lautet:
+
+> Wartezeiten steigen stark an, wenn die Auslastung hoch wird.
+
+Anschaulich: Wenn eine Maschine „fast immer“ beschäftigt ist, reichen schon kleine Zufallsschwankungen (z. B. leicht längere Bearbeitungen einzelner Werkstücke), damit sich eine Schlange aufbaut – und diese Schlange baut sich nur langsam wieder ab.
+
+**Verbindung zu unserem Plot (der „Knick“)**
+
+Der sichtbare Knick ab ca. 75–80% Last passt genau zu dieser Logik:
+
+- Unterhalb dieser Schwelle ist die Wartezeit meist gering → CycleTime wächst nur moderat.
+Oberhalb dieser Schwelle dominiert zunehmend die Wartezeit → CycleTime steigt deutlich schneller an, Warteschlangen entstehen.
+- Damit haben wir eine plausible Interpretation für das Muster aus der EDA: Die ungewöhnlich langen CycleTime-Werte sind sehr wahrscheinlich keine extrem langen Bearbeitungszeiten einzelner Werkstücke, sondern entstehen durch Wartezeiten im (fast) ausgelasteten System.
+
+# Empfehlung
+Um das Auftreten der Warteschlangen zu verifizieren, sollten wir in der Produktion nach solchen Warteschlangen suchen. Z.B. Mitarbeiter befragen, ob sie Warteschlangen beobachten. Die Verlängerung der Produktionszeiten sind so hoch, dass Warteschlangen leicht identifiziert werden sollten. Wenn Warteschlangen das Problem sind, dann müssen die vorgelagerten Prozesschritte analysiert werden, ob diese zu viele Vorprodukte liefern oder es ist notwendig mehr Maschinen zu installieren um die einzelne Maschine unter 75% Last betreiben zu können.
+
+# Zusammenfassung (Takeaways)
+
+- **EDA-first:** Wir starten mit echten Daten und visualisieren zuerst. Theorie holen wir on-demand, wenn sie zur Interpretation nötig ist.
+
+- **Datenqualität ist Teil der Analyse:** Datentypen korrekt setzen (kategorial vs. numerisch), Tippfehler bereinigen und fehlende Werte bewusst behandeln – sonst können Visualisierungen und Kennzahlen in die Irre führen.
+
+- **Histogramm + Kennzahlen ergänzen sich:**<br>
+Histogramme zeigen die Form der Verteilung, Kennzahlen machen sie quantitativ.
+In unseren Daten ist Median < Mittelwert ⇒ die Verteilung ist rechtsschief (Ausreisser ziehen den Mittelwert nach oben).
+
+- **Boxplot als kompakter Verteilungs-Check:**<br>
+Quartile und IQR beschreiben die mittleren 50% der Daten und markieren Ausreisser pragmatisch über die 1.5·IQR-Regel. Damit sieht man schnell: „Was ist typisch?“ und „Was ist ungewöhnlich?“ .
+
+- **Zentrale Erkenntnis im Beispiel:**<br>
+Im Streudiagramm zeigt sich ein nichtlinearer Knick: Ab ca. 75–80% Last steigt CycleTime deutlich stärker an.
+
+- **Interpretation im Kontext (Warteschlange):**<br>
+CycleTime ist im Prozess nicht nur Bearbeitungszeit, sondern
+$$
+\text{CycleTime} = \text{Bearbeitungszeit} + \text{Wartezeit}.
+$$
+Load interpretieren wir als Auslastung. Ein Effekt aus der Warteschlangentheorie erklärt den Knick:
+Wartezeiten steigen stark an, wenn die Auslastung hoch wird.
+Die langen CycleTime-Werte sind damit plausibel als Wartezeiten im (fast) ausgelasteten System interpretierbar (nicht als „extrem lange Bearbeitung“ einzelner Werkstücke).
+
+- **Empfehlung / nächster Schritt (vom Datenbild zur Realität):**<br>
+Um die Warteschlangen-Hypothese zu verifizieren, sollten wir in der Produktion gezielt nach Warteschlangen suchen (z. B. Beobachtung vor Ort, Befragung der Mitarbeitenden).
+Falls Warteschlangen tatsächlich die Ursache sind, sind zwei naheliegende Stellhebel:
+
+  1. vorgelagerte Prozessschritte so steuern, dass nicht dauerhaft „zu viel“ in die Maschine nachläuft,
+  2. Kapazität erhöhen, damit die Maschine typischerweise unter ~75% Last betrieben werden kann.
+
+# Pragmatisches Vorgehen in der Praxis
+In der Praxis ist häufig sinnvoll in den nachfolgenden Schritten bei der EDA vorzugehen:
+
+1. **(Erste) Frage formulieren:** Was genau willst du wissen (möglichst konkret)?
+
+2. **Daten einlesen:** Daten in R laden (und dabei bereits erste Probleme notieren).
+
+3. **„Packaging“ prüfen (Schnell-Check):** Stimmen Dimensionen, Variablennamen, Einheiten, Zeitraum, Wertebereiche grob?
+
+4. **str() ausführen:** Sind Datentypen plausibel (numeric vs. factor vs. date/time)?
+
+5. **Top & Bottom ansehen (head(), tail()):** Siehst du offensichtliche Formatfehler, Ausreisser, kaputte Codes, falsche Zeitstempel?
+
+6. **Deine „n“s prüfen**
+
+- Wie viele Zeilen insgesamt?
+- Wie viele pro Gruppe?
+- Wie viele NA?
+- Doppelte Zeilen?
+
+7. **Mit externer Quelle validieren:** Mindestens ein Plausibilitätscheck gegen „Wissen von aussen“ (Domänenwissen, Dokumentation, Referenzwerte).
+
+8. **Erst die einfache Lösung versuchen:** Eine grobe, erste Antwort liefern (deskriptiv, ohne Overengineering).
+
+9. **Die eigene Lösung challengen:** Robustheit testen: andere Filter/Bins/Skalen?
+
+- Ausreisser?
+- Subgruppen?
+- Sensitivität?
+
+10. **Follow-up Fragen ableiten:** Was ist als Nächstes zu klären? Brauchst du andere Daten? War die Frage richtig gestellt?
+
+
+
+
+
