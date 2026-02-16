@@ -63,6 +63,9 @@ Kann nur abzählbare, voneinander getrennte Werte annehmen.
 **Stetiges Merkmal**<br>
 Kann innerhalb eines Intervalls beliebig viele Zwischenwerte annehmen.
 
+**Empirische Verteilungsfunktion**<br>
+Das ist die Verteilungsfunktion der konkrekten Stichprobe.Das bedeutet: Für einen Wert x zählt man, wie viele Beobachtungen <= x sind, und teilt durch die Gesamtanzahl n.
+
 ## Merkmalausprägungen
 
 Merkmale/Variablen unterscheiden sich teilweise erheblich. Das Merkmal Farbe kennt nur Merkmalausprägungen wie rot, grün, blau. Hingegen die Leistung des Motors in PS wird numerisch angegeben. 

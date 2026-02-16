@@ -1,0 +1,167 @@
+---
+title: "PVA01"
+format: html
+---
+
+Aus Daten erstellt man ein Modell. Mit dem Modell kann man dann weitere Berechnungen machen ohne weitere Daten zu benötigen. 
+
+Ein fairer Würfel ergibt einen Mittelwert 3.5. 
+Wenn 1 Million mal gewürfelt wird und ich erhalte einen Mittelwert von 3, dann ist es kein fairer Würfel. Das ganze kann man berechnen. Werden wir in einer kommenden PvA machen.
+
+Statistik kennt nur Wahrscheinlichkeiten. Kein 100% richtig oder 100% falsch. 
+
+digital-ai-finance.github.io => Ist von Jörg und behandlet alles was in diesem Kurs wichtig ist.
+
+Was ist eigentlich Statistik?
+
+- Daten sammeln, organisieren und zusammefassen
+- Aus Daten Schlussfolgerungen ziehen
+- Entscheidungen unter Unsicherheit zu fällen
+
+Zwei Hauptzeige:
+
+- Deskriptive Statistik: Daten zusammenfassen und visualisieren
+- Inferenzstatistik: Schlussfolgerungen über Grundgesamtheit aus Stichproben ziehen
+
+---
+
+Wir können aus einer Stichprobe von 1000 Leuten den Abstimmungsausgang relativ genau berechnen. Wichtig ist dabei nur, dass die 1000 Leute repräsentativ für die Bevölkung sind. Hier muss gut ausgewählt werden. Auch das lässt sich mathematisch beweisen.
+
+Wenn ChatGPT einen Wortschaftz von 200k hat, berechnet er für jedes Wort die Wahrscheinlichkeit des nächsten Wortes. Und so setzt er die Worte zusammen. Hier ist klar erkennbar, dass Statistik wichtig ist.
+
+Wahrscheinlichkeit ist immer eine Zahl zwischen 0 (unmöglich) und 1 (sicher). Geschrieben als P(Ereignis).
+
+P(Kopf) = 0.5 bedeutet, Kopf tritt 50% der Zeit auf.
+
+Drei Interpretationen:
+
+- Frequentistisch: Langfristige Häufigkeit (Münze 1000 Mal werfen --> 500 Mal Kopf)
+- Bayesianisch: Grad der Überzeugung ("Ich bin zu 70% überzeugt, dass es regnen wird")
+- Klassisch: Gleich wahrscheinliche Ergebnisse (Würfel: 1/6)
+
+Bei der Wahrscheinlichkeit wird ein Modell benötigt.
+
+Bei der Statistik werden Daten benötigt.
+
+Wahrscheinlichkeit: Was wird passieren? (vom Modell zu den Daten)<br>
+Statistik: Was ist passiert? (Von den Daten zum Modell)
+
+---
+
+![Renditeverteilung](images/PVA01 - Renditeverteilung.png)
+
+- Die Dichte: Angenommen das zeigt die Anzahl der Beobachtungen
+- 0.25 = 25 Beobachtungen
+- Also 25 Beobachtungen, dass die Preisteigerung 0 ist
+- etc.
+
+---
+
+![Parameter vs Statistic](images/PVA01 - Parameters vs Statistic.png)
+
+---
+
+Machine Learning geht von den Daten zum Modell. 
+
+---
+
+Stetig: Beliebige Werte dazwischen => zwischen 1 und 2 hat es beliebige Werte dazwischen<br>
+Beispiel: Zwischen Grösse 160cm und 210cm gibt es meliebige Werte dazwischen (z.B. 190.5)
+
+Diskret: Klare Werte => Anzahl an einem Tag ausgeführte Trades ist 1, 2, 3, 4, usw.<br>
+Aber es gibt nicht 1.5 Trades dazwischen. Daher Diskret.
+
+---
+
+# Deskriptive Statistik
+Deskriptive Statistik fasst Daten zusammen und beschreibt sie
+
+- Rohdaten in aussagekr¨ aftige Informationen organisieren
+- Muster, Trends und Ausreißer identifizieren
+- Ergebnisse klar kommunizieren
+
+Zwei Hauptkategorien:
+
+- Numerische Zusammenfassungen: Mittelwert, Varianz, Perzentile
+- Visuelle Zusammenfassungen: Histogramme, Boxplots, Streudiagramme
+
+---
+
+Fachwörter erklärt:
+
+- Mittelwert: Der Durchschnitt
+  - Wird für symmetrische Daten bevorzugt, da er alle Informationen in den Daten nutzt
+- Median: Teilt die Daten in zwei Hälften (anhand der Messpunkte)
+  - Daher ist der Median nicht gleich dem Mittelwert
+  - Ist für schiefe Daten oder Daten mit Ausreissern geeigneter als der Mittelwert
+  - Der Median ist robust gegenüber Ausreissern, da er nur den mittleren Wert berücksichtigt, nicht die tatsächlichen Werte der extremen Beobachtungen
+  - Bei einem Datensatz mit den Werten 2, 4, 6, 8, 10 ist der Median genau 6. Weil => Mit 5 Werten (ungerade n) ist der Median der mittlere Wert. Wenn sortiert: 2, 4, 6, 8, 10. Der dritte Wert (6) ist der Median. => also die 6 liegt in der Mitte, daher ist dies der Median-Wert
+- Modus: Der am häufigsten vorkommende Wert
+  - Kann keinen Modus, einen Modus oder mehrere Modi haben
+  - Nützlich für kategoriale Daten
+  - Unimodal: Ein Gipfel
+  - Bimodal: Zwei Gipfel
+  - Multimodal: Mehrere Gipfel
+- Quartile (Q1, Q2, Q3): Die 25., 50. und 75. Percentile
+- Interquartilsabstand (IQR): ist der Wert nach der Rechnung von Q3 minus Q1
+- Varianz: Wie weit liegen die Datenpunkte im Durchschnitt vom Mittelwert entfernt?
+  - Die Formel davon müssen wir uns merken!
+  - Hierbei werden die Abstände vom Mittelwert quadriert. Das stellt sicher, dass alle Abstände positiv sind (verhindert Aufhebung) und bestraft grosse Abweichungen stärker als kleine
+- Stichprobevarianze
+  - Wird durch n-1 geteilt weil: Die Division druch (n-1) wird Bessel-Korrektur genannt. Sie liefert eine unverzerrte Schätzung der Populationsvarianz bei der Arbeit mit Stichproben
+- Standardabweichung und Varianz: Standardabweichung = Quadratwurzel der Varianz
+- Variationskoeffizient: Standardabweichung mit Mittelwert
+  - VK = (Standardabweichung / Mittelwert) x 100%. Er ermöglicht den Vergleich von Variabilität über Datensätze mit unterschiedlichen Einheiten oder Skalen hinweg.
+- Schiefe: Verteilung nach links (links ist mehr)
+- Kurtosis: Verteilung nach rechts (rechts ist mehr)
+  - Positive Exzess-Kurtosis: Die Verteilung hat fette Schwänze (Tails), also mehr Extremwerte als normal
+- Streudiagramm: zeigt die Beziehung zwischen zwei Variablen, indem jede Beobachtung als Punkt mit x- und y-Koordinaten dargestellt wird
+
+
+Was sind die Komponenten der Fünf-Zahlen-Zusammenfassung?<br>
+=> Minimum, Q1, Median, Q3, Maximum
+
+
+![Welches Mass verwenden?](images/PVA01 - Welches Mass verwenden.png)
+
+---
+
+Boxplot:
+
+- Die fette Schwarze Linie ist der Median
+  - Ist manchmal nicht in der Mitte weil:
+  - die Daten nicht symetrisch sind. Also beispielsweise unterhalb des Medians breiter verteilt
+- In der Box liegen 50% der Werte
+- Unten ist Q1
+- Oben ist Q3
+- Die Linien nach oben und unten haben eine bestimmte Länge:
+  - Die Höhe der Box wird mal 1.5 gerechnet und dann nach oben und unten gezeichnet
+  - 1.5 weil: Falls die Daten normal verteilt sind, liegt innerhalb der ganzen Anzeige 99% der Werte
+  - Wenn die Daten nicht normal verteilt sind, liegen darin mindestens 50% und höchstens 100%
+  Ist 1.5 korrekt? --> Nochmals nachprüfen...
+
+![Boxplot - Example](images/PVA01 - Boxplot.png)
+
+---
+
+# Ausblich auf nächste Mal - Vorbereitung
+- Alles lesen - Alle Themen der Vorbereitung sind wichtig
+- Die drei Axiome von Kolmogorov anschauen (5 Minuten Aufwand)
+  - Wenn man das verstanden hat, ist der Teil Wahrscheinlichkeitsrechnung anscheinend viel einfacher
+- Kurztest 01
+  - Closed Book
+  - Fragen zur Vorbereitung auf die PVA 02
+  - Nur Theoriefragen
+  - Nur Multiple Choice Fragen
+
+
+
+
+
+
+
+
+
+
+
+
