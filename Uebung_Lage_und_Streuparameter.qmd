@@ -1,0 +1,167 @@
+---
+title: "Uebung_Lage_und_Streuparameter"
+format: html
+---
+
+# Übung 1.1a, nicht detailliert
+
+## Ausgangslage
+
+In einer Kleinstadt wird im Sommer während einer Periode von 60 Tagen die Maximaltemparatur (in Grad Celsius) erhoben.
+
+Anzahl Tage: 13  30  15   2<br>
+Max-Temp:    27  28  29  35
+
+Die Messwerte sind also zusammengefasst, statt in einzelnen Punkten angegeben.
+
+Wir haben deutlich mehr Werte mit einer Messung ovn 28 Grad. 
+
+Es handelt sich hierbei um eine diskrete Verteilung mit abosluten Häufigkeiten. Wenn wir Mittelwert oder Streuung berechnen, behandeln wir jede Temperatur so oft, wie sie vorkommt. Statt 60 Zahlen auszuschreiben, nutzen wir Gewichtung.
+
+Der gewichtete Mittelwert lautet: 
+$$\bar{x} = \frac{27*13+28*30+29*15+35*2}{60}$$
+Das ergibt ca. 28.27 Grad.
+
+## Frage 1
+Welche der folgenden Lageparamter können hier sinnvoll berechnet werden?
+
+- a) Median
+- b) arithemtisches Mittel (gewichtet)
+- c) geometrisches Mittel
+
+Antworten:
+
+- a) Ja, weil der Medain immer bei ordinal oder metrisch skalierten Daten funktioniert
+- b) Ja, weil es der Standard bei metrischen Daten ist => Berechnung ist oben ersichtlich
+- c) Nein. Temperatur in Grad Celsius ist nur intervallskaliert aber nicht verhältnisskaliert. Daher dürfen hiermit nur Additionen und Subraktionen aber keine Multiplikationen und Divisionen ausgeführt werden. Darum ist die Berechnung des geometrischen Mittels hier nicht sinnvoll.
+  
+Die Berechnung für a) ist wie folgt:<br>
+Wir haben 60 Tage. Bei gerader Anzahl ist der Median der Mittelwert des 30. und 31. Wertes in der sortierten Liste.
+
+Die sortierte Verteilung sieht so aus:
+
+- Plätze 1 bis 13: 27 Grad
+- Plätze 14 bis 43: 28 Grad
+- Plätze 44 bis 58: 29 Grad
+- Plätze 59 bis 60: 35 Grad
+
+Der 30. und 31. Wert liegt jeweils im Bereich 4 bis 43. Also beide sind 28 Grad. Daher muss der Median 28 Grad sein.
+
+Hier zeigt sich nochmals klar, dass der Median die Werte teilt. So, dass auf beiden Seiten gleich viele Werte stehen. Und der Wert für den Median ist dann einfach derjenige Messpunkt, der Mittig steht.
+
+
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+
+# Um die Messwerte in einem Tibble darzustellen, benötigen wir die einzelnen Messwerte, statt der Zusammenfassung.
+# rep() erstellt wiederholte Wert. 
+
+temps <- tibble(
+  temp = c(
+    rep(27, 13),
+    rep(28, 30),
+    rep(29, 15),
+    rep(35, 2)
+  )
+)
+
+# Mit summary() lassen sich danach die Werte für Median und Mean ausgeben.
+summary(temps)
+```
+
+
+## Frage 5
+Welche der folgenden Streuungsparameter können hier sinnvollerweise berechnet werden?
+
+- a) Spannweite
+- b) Standardabweichung
+- c) Variationskoeffizient
+
+Antworten:
+
+- a) Ja, weil die Spannweite lediglich MAX - MIN ist. Unabhängig von Skala
+- b) Ja, weil Temperaturen metrisch sind. Also darf die Streuung um den Mittelwert berechnet werden
+- c) Nein, da in C°. Der Variationskoeffizient setzt eine natürliche Null (Verhältnisskala) voraus. Bei Celsius ist 0°C willkürlich gewählt und stellt nicht "keine Temperatur" dar. Zur Berechnung des Variationskoeffizienten muss man die Standardabweichung durch das arithemtische Mittel teilen. Eine solche Division ist aber bei intervallskalierten Merkmalen nicht zulässig. Dafür wäre Verhältnisskalierung notwendig.
+
+Berechnung Spannweite: 35 (MAX) - 27 (MIN) = 8
+
+Berechnung Standardabweichung:<br>
+Mit Häufigkeiten, auf Basis der 60 Tage. Der Mittelwert ist wie oben berechnet: $\bar{x} = 28.2667$
+
+Jetzt muss jeder Messpunkt minus den Mittelwert berechnet und anschliessend quadriert werden. Also wie folgt:
+
+- $13 * (27 - 28.2667)^2 \approx 20.8444$
+- $30 * (28 - 28.2667)^2 \approx 2.1333$
+- $15 * (29 - 28.2667)^2 \approx 8.0667$
+- $2 * (35 - 28.2667)^2 \approx 90.7022$
+
+Die Summe davon ergibt $\approx 121.7467$.
+
+Varianz (Population, druch n = 60): $o^2 = \frac{121.7467}{60} \approx 2.0289$<br>
+Wurzel ziehen: $o = \sqrt{2.0289} \approx 1.42$
+
+
+# Übung 1.1b, nicht detailliert
+
+## Ausgangslage
+In einem Betrieb werden 117 Kundinnen und Kunden zu deren Zufriedenheit befragt. Sie geben diese auf einer Skala von 1 ("sehr unzufrieden") bis 5 ("sehr zufrieden") an. Es dürfen nur ganze Werte angegeben werden.
+
+Wert:   1   2   3   4   5<br>
+Anzahl: 6  12  30  18  51
+
+Die Leiterin des Betriebes macht sich jetzt Gedanken zum Mittelwert der Kundenzufriedenheit und zu deren Streuung.
+
+## Frage 1
+Welche der folgenden Mittelwerte (Lageparameter) können in diesre Situation berechnet werden:
+
+- a) Modus
+- b) Median
+- c) geometrisches Mittel
+- d) arithmetisches Mittel (gewichtet)
+
+Antwort:
+
+- a) Ja. Der am häufigsten vorkommende Wert ist klar ersichtlich. Nämlich der Wert 5 mit einer Anzahl von 51.
+- b) Ja. Funktioniert immer bei ordinal oder metrisch skalierten Daten. Likert ist mindestens ordinal
+- c) Nein. Es gibt keine 0
+- d) Ja. Kann angewendet werden
+
+Berechnung Median:
+
+- Plätze 1 bis 6: Wert 1
+- Plätze 7 bis 18: Wert 2
+- Plätze 19 bis 48: Wert 3
+- Plätze 49 bis 66: Wert 4
+- Plätze 67 bis 117: Wert 5
+
+117 Werte geteilt durch 2 ergibt 58.5. Also muss der 59. Platz für den Median gewählt werden. Dieser liegt beim Wert 4. Daher ist der Median = 4. Oder mit anderen Worten: Mindestens die Hälfte der Kund:innen geben 4 oder 5.
+
+```{r}
+points <- tibble(
+  point = c(
+    rep(1, 6),
+    rep(2, 12),
+    rep(3, 30),
+    rep(4, 18),
+    rep(5, 51)
+  )
+)
+
+summary(points)
+```
+
+
+Durch den summary ist ersichtlich, dass der Mittelwert (Mean) 3.821 ergibt.
+
+Musterantwort für die Analyse der Werte:
+
+Der Wert 5 ("sehr zufrieden") wurde am häufigsten gewählt. Daher ist es der Modus. Es handelt sich aber nicht um die absolute Mehrheit der  Nennungen. Daher liegt der Median, der mittlere Wert der Reihenfolge nach, unter 5, nämlich bei 4.
+
+Spannweite, Standardabweichung und Variationskoeffizient können nicht sinnvoll berechnet werden, weil dazu mit den Punktwerten gerechnet werden muss, was bei intervallskalierten Grössen nicht zulässig ist.
+
+
+
+
