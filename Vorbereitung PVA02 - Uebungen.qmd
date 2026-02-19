@@ -1,0 +1,193 @@
+---
+title: "Vorbereitung PVA02 - Uebungen"
+format:
+  html:
+    mathjax:
+      packages: ["cancel"]
+---
+
+# Wahrscheinlichkeit 2.1.a, nicht detailliert
+
+## Frage 1
+
+Für eine technische Anlage werden neue Geräte gekauft. Der Hersteller gibt für jedes Gerät die Ausfallwahrscheinlichkeit pro Tag an: 1% für Gerät A, 2% für Gerät B, 5% für Gerät C. Diese Angaben gelten jeweils unabhängig von den anderen Geräten. Die ganze Anlage läuft nur, wenn alle Geräte laufen. Da C die grösste Ausfallwahrscheinlichkeit hat, werden zwei Geräte C gekauft, wovon eines in Reserve gehalten wird, falls das andere ausfällt. Der technische Leiter überlegt sich jetzt, mit welchen Ausfallwahrscheinlichkeiten
+er für die Anlage rechnen muss.
+
+Ausfallwahrscheinlichkeiten die gegeben sind:
+
+- Gerät A: $P(A_{aus}) = 0.01$
+- Gerät B: $P(B_{aus}) = 0.02$
+- Gerät C: $P(C_{aus}) = 0.05$
+
+Die Anlage läuft nur, wenn A und B läuft und mindestens eines der beiden C-Geräte läuft.
+
+Zuerst die Wahrscheinlichkeit bestimmen, dass jedes Gerät funktioniert.
+
+- Für A: $P(A_{läuft}) = 1 - 0.01 = 0.99$
+- Für B: $P(B_{läuft}) = 1 - 0.02 = 0.98$
+- Für C: $P(beide C fallen aus) = 0.05 * 0.05 = 0.0025$
+  - Also: $P(mindestens ein C läuft) = 1 - 0.0025 = 0.9975$
+  
+Nun die Wahrscheinlichkeit Berechnen, dass die ganze Anlage läuft:
+
+$P(Anlage läuft) = 0.99 * 0.98 * 0.9975 \approx 0.9677745$<br>
+Damit ergibt sich die Ausfallwahrscheinlichkeit: $P(Anlage fällt aus) = 1 - 0.9677745 \approx 0.0322255$<br>
+Gerundet auf zwei Kommastellen: 3.22%
+
+## Frage 2
+Mit welcher Wahrscheinlichkeit fällt die Anlage während einer Arbeitswoche (5 Tage, voneinander unabhängig) an mindestens einem Tag aus? Geben Sie das Resultat auf zwei Stellen nach dem Komma an.
+
+Wenn in der Aufgabenstellung "Mindesetns einmal" steht, muss man fast immer über das Komplement rechnen. Das Gegenergebnis lautet also: Die Anlage fällt an keinem der fünf Tage aus.
+
+Die Wahrscheinlichkeit, dass sie an einem Tag NICHT ausfällt, ist wie oben bereits berechnet: 0.9677745
+
+Für 5 unabhängige Tage wäre das $0.9677745^5 \approx 0.8491$
+
+Also ist die gesuchte Wahrscheinlichkeit: $P(mindestens ein Ausfall) = 1 - 0.8491 \approx 0.1509$
+
+Also 15.09%
+
+Wenn das ganze mit der Ausfallwahrscheinlichkeit berechnet worden wäre ($0.0322255^5$) hätte man die Wahrscheinlichkeit berechnet, dass die Anlage an allen 5 Tagen ausfällt. => Logik, weisste? :D
+
+## Frage 3
+An einem Tag wird dem technischen Leiter der Ausfall der Anlage gemeldet. Er überlegt sich, mit welcher Wahrscheinlichkeit das besonders teure Gerät A ausgefallen ist.
+
+Welcher Typ Wahrscheinlichkeit ist hier gefragt? 
+
+Es handelt sich um eine bedingte Wahrscheinlichkeit, weil ein Ereignis (Ausfall der Anlage) sicher eingetreten und daher bekannt ist. Unter dieser Bedingung wird nun nach der Wahrscheinlichkeit für das Eintreten eines andren Ereignisses (Ausfall von A) gefragt.
+
+## Frage 4
+Berechnen Sie jetzt die gesuchte bedingte Wahrscheinlichkeit, dass A defekt ist, wenn die Anlage ausgefallen ist.
+Geben Sie das Resultat auf zwei Stellen nach dem Komma an.
+
+Das ist jetzt eine klassische Bayes-Fragestellung.
+
+$P(_{defekt} | Anlage ausgefallen)$ => Wenn die Anlage ausgefallen ist - wie wahrscheinlich war dann Gerät A die Ursache?
+
+Zuerst Ereignisse sauber definieren:
+
+- Gerät A fällt aus: $P(A) = 0.01$
+- Gerät B fällt aus: $P(B) = 0.02$
+- Beide Geräte C fallen aus: $P(C_{beide}) = 0.05^2 = 0.0025$
+- Bereits berechnet: $P(Anlage fällt aus) \approx 0.0322255$
+
+Bayes besagt: $P(A_{defekt} | Anlage ausgefallen) = \frac{P(A_{defekt})}{P(Anlage ausgefallen)}$
+
+=> $\frac{0.01}{0.0322255} \approx 0.3103 = 31.03%$
+
+Die Wahrscheinlichkeit, dass das Gerät A defekt ist, liegt also bei 31.03%.
+
+
+# Kombinatorik 1.2.a, nicht detailliert
+
+Eine Getränkehandlung hat zehn Sorten Weisswein und zehn Sorten Rotwein im Sortiment. Seit einiger Zeit bietet sie ein Set mit vier verschiedenen Flaschen Wein an. Die Verkaufszahlen für dieses Set sind jetzt rückläufig. Die Leiterin der Getränkehandlung möchte in Zukunft die Zusammensetzung des Sets periodisch verändern, um der Kundschaft Abwechslung zu bieten. An der Grösse des Sets (4 Flaschen) will sie aber vorderhand festhalten. Sie überlegt sich jetzt, wie viele Möglichkeiten zur Zusammensetzung der Sets es gibt.
+
+## Frage 1
+Wie viele Möglichkeiten gibt es, wenn das Set aus vier verschiedenen Flaschen Rotwein bestehen soll? Wieviele Möglichkeiten gibt es, wenn das Set aus je zwei verschiedenen Flaschen Rot- und Weisswein bestehen soll?
+
+Die Reihenfolge ist nicht wichtig. Also wird die Kombinatorik verwendet. Wir wählen 4 aus 10 Rotweinflaschen. Das ist:
+
+$(\frac{10}{4}) = \frac{10!}{6!*4!} = \frac{10*9*8*7* \cancel{6!} }{\cancel{6!}*4*3*2*1} = \frac{5040}{24} = 210$ Möglichkeiten. Da Zähler und Nenner beide eine 6! haben, kann diese bei beiden Orten gestrichen werden.
+
+Wenn zwei Rot- und zwei Weissweisen gezogen werden müssen, ergibt sich die folgende Rechnung:
+
+$(\frac{10}{2})*(\frac{10}{2})$
+
+Zuerst 1 Mal: $(\frac{10}{2}) = \frac{10 * 9 * \cancel{8!}}{\cancel{8!}*2*1} = \frac{90}{2} = 45$
+
+Und jetzt einfach: $45 * 45 = 2025$ Möglichkeiten.
+
+## Frage 2
+Das Konzept wird etwas geändert: Ein Set kann in Zukunft aus drei oder vier Flaschen bestehen. Aus Platzgründen ist aber immer nur ein Set gleichzeitig im Angebot. Wie viele Möglichkeiten gibt es jetzt, wenn die Sets nur aus Weissweinflaschen bestehen sollen?
+
+=> $(\frac{10}{4}) + (\frac{10}{3})$ => Addition weil sich die 3er- und 4er-Sets gegenseitig ausschliessen.
+
+Den ersten Teil übernehmen wir von oben: $210$<br>
+
+Berechnung zweiter Teil: $(\frac{10}{3}) = \frac{10*9*8*\cancel{7!}}{\cancel{7!}*3*2*1} = \frac{720}{6} = 120$
+
+Da sich die möglichen 3er- und 4er-Sets gegenseitig ausschliessen, dürfen wir addieren.
+
+Und jetzt einfach: $210+120 = 330$ Möglichkeiten.
+
+## Frage 3
+Vier besonders dekorative Flaschen werden im Schaufenster ausgestellt. Ihre Reihenfolge soll gelegentlich geändert werden. Wie viele Möglichkeiten gibt es dafür?
+
+Hier ist jetzt die Reihenfolge entscheidend. Daher gilt Permutation.
+
+Für das erste Feld der Flaschen haben wir 4 Möglichkeiten. Für das zweite noch 3. Für das dritte noch 2 und für das letzte 1. Daher die Rechnung:
+
+$4! = 4*3*2*1 = 24$ Möglichkeiten die Flaschen anzuordnen.
+
+
+# Satz von Bayes 2.3.a, nicht detailliert
+
+In einem Betrieb werden Geräte produziert. 5% davon sind Ausschuss. Das führt häufig zu Retouren und Kundenreklamationen.
+Die Geschäftsleitung lässt daher eine zusätzliche Qualitätskontrolle (Endkontrolle) installieren. Diese ist aber ihrerseits nicht völlig zuverlässig: Wenn ein Gerät gut ist, bezeichnet es die Kontrolle dennoch in 6% der Fälle als defekt; umgekehrt bezeichnet sie aber auch 4% der defekten Geräte als gut.
+
+Die Produktionsleiterin hat Zweifel, was die Kontrolle tatsächlich nützt. Deren Fehlerquote hat ja dieselbe Grössenordnung wie die Ausschussquote in der Produktion.
+
+Die Produktionsleiterin möchte wissen, wie gross die Wahrscheinlichkeit ist, dass ein Gerät, das von der Kontrolle als gut eingestuft wurde, auch tatsächlich gut ist.
+
+## Frage 1
+Betrachten Sie die folgenden Ereignisse:
+
+- G = Das betrachtete Gerät ist gut.
+- K = Die Kontrolle bezeichnet das betrachtete Gerät als gut.
+
+Dann gilt P(G) = 0,95.
+
+Die beiden übrigen gegebenen Wahrscheinlichkeiten aus der Problemstellung sind:
+
+=> Es handelt es sich um bedingte Wahrscheinlichkeiten. Je nachdem, ob ein Gerät gut oder defekt ist (Bedingung) ist die Wahrscheinlichkeit, dass es von der Kontrolle als gut (defekt) bezeichnet wird, eine andere.
+
+## Frage 2
+Die folgenden Aussagen sind korrekt.
+
+- $P(\bar{G}) = 0.05$
+- $P(K | \bar{G}) = 0.04$
+
+Nicht korrekt ist:
+
+- $P(K | G) = 0.94$ => stimmt nicht
+- $P(G | K) = 0.94$ => Die Bedingung ist laut Aussage nicht die Kontrolle der Geräte
+- $P(\bar{G} | K) = 0.04$ => Die Bedingung ist laut Aussage nicht die Kontrolle der Geräte
+
+## Frage 3
+Die Produktionsleiterin möchte wissen, wie gross die Wahrscheinlichkeit ist, dass ein von der Kontrolle als gut eingestuftes Gerät auch tatsächlich gut ist.
+Welche Wahrscheinlichkeit ist also gesucht? 
+
+=> $P(G | K)$ => Die Bedingung ist K und die gesuchte Wahrscheinlichkeit ist G
+
+## Frage 4
+Berechnen Sie jetzt diese Wahrscheinlichkeit für die Produktionsleiterin.
+Geben Sie das Resultat auf eine Stelle nach dem Komma an.
+
+Hierfür kann die Bayes Formel verwendet werden.
+
+$P(G | K) = \frac{P(K | G) * P(G)}{P(K)}$
+
+$P(K | G)$ kennen wir bereits und ist: 0.94
+
+$P(G)$ kennen wir auch und ist: 0.95
+
+$P(K)$ ist die Wahrscheinlichkeit, dass ein Gerät von der Kontrolle als gut eingestuft wird - unabhängig davon, ob es wirklich gut ist. Das wäre nach dem Satz der totalen Wahrscheinlichkeit:
+
+$P(K) = P(K | G) * P(G) + P(K | \bar{G}) * P(\bar{G})$
+
+Die bekannten Zahlen können wir einsetzen:
+
+$P(K) = 0.94 * 0.95 + 0.04 * 0.05 = 0.893 + 0.002 = 0.895$
+
+
+Die Werte können jetzt in die Bayes Formel eingesetzt werden.
+
+$P(G | K) = \frac{0.94 * 0.95}{0.895} = \frac{0.893}{0.895} \approx 0.9978$
+
+
+
+
+
+
+
+
