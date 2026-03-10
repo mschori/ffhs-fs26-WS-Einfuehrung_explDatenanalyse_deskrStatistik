@@ -10,6 +10,7 @@ format: html
 - Ergebnismenge: Alle möglichen Ergebnisse, die ein Ereignis annehmen kann
   - Bei einem Würfel wäre das: E = {1, 2, 3, 4, 5, 6}
 - Ereignis: Ein einzelnes Ereignis in der Ereignismenge
+- Satz von Bayes: Verknüpft die bedingte Wahrscheinlichkeit $P(A|B)$ mit der umgekehrten bedingten Wahrscheinlichkeit $P(B|A)$ und den unbedingten Wahrscheinlichkeiten $P(A)$ und $P(B)$
 - LaPlace: p = Anzahl der möglichen Ereignisse / die Anzahl aller Ereignisse
   - Das gilt, wenn alle Ergebnisse gleich wahrscheinlich sind
   - Bei einem Würfel wäre die Wahrscheinlichkeit, dass eine 2 gewürfelt wird: p = 1 / 6
@@ -266,7 +267,7 @@ Bei medizinischen Tests unterscheidet man zwischen zwei Ebenen:
 
 Daraus entstehen _vier_ Fälle in einer Vierfeldertafel:
 
-|Test positiv|Test negativ|
+| ° |Test positiv|Test negativ|
 |---|---|---|
 |**tatsächlich krank**|richtig-positiv (_rp_)|falsch-negativ (_fn_)|
 |**tatsächlich gesund**|falsch-positiv (_fp_)|richtig-negativ (_rn_)|
@@ -336,6 +337,46 @@ Beispiel aus dem Buch:
 - Prävalenz = 1%
 
 → Trotz sehr guter Testqualität ist:<br>
+
 #### $P(\text{tatsächlich krank} \mid \text{Test positiv}) \approx 50\%$
 
 Das heißt: Die Hälfte aller positiv Getesteten ist trotzdem gesund.
+
+In anderen Worten:<br>
+Die Sensitivität (P(Test positiv ∣ krank)) und die Spezifität (P(Test negativ ∣ gesund)) beschreiben die Leistung des Tests, sind aber bedingte Wahrscheinlichkeiten, die auf die Testmethode bezogen sind. Der Patient möchte die bedingte Wahrscheinlichkeit P(tatsächlich krank ∣ Test positiv) kennen, da diese direkt die Wahrscheinlichkeit eines korrekten Alarms nach dem Test darstellt. Dieser Wert wird mittels des Satzes von Bayes berechnet und ist insbesondere bei seltenen Krankheiten (niedriger Prävalenz) oft deutlich niedriger als erwartet.
+
+## 6. Beispiel-Berechnungen
+
+#### Beispiel 1
+
+In einer Population von 1.000 Personen sind 10 Personen tatsächlich mit einer Krankheit infiziert (Prävalenz 1%). Ein Testverfahren wird angewendet, das eine Sensitivität von 90% aufweist.
+Wie viele Personen in dieser Population erhalten voraussichtlich ein falsch-negatives Ergebnis?
+
+Erläuterung: Falsch-negative Befunde sind Personen, die tatsächlich krank sind, aber negativ getestet wurden.
+
+1. Anzahl der tatsächlich Kranken (rp+fn): 1.000⋅0,01=10 Personen.
+2. Sensitivität ist die Wahrscheinlichkeit, dass Kranke korrekt erkannt werden (rp). Da die Sensitivität 90% beträgt, werden 10% der Kranken übersehen (falsch-negativ).
+3. Anzahl der falsch-negativen Befunde (fn): 10⋅(1−0,90)=1 Person.
+
+#### Beispiel 2
+
+Bei einem medizinischen Screening auf eine seltene Krankheit liegt die Prävalenz P(A) (tatsächlich krank) bei 0.01. Die Sensitivität (P(B∣A), Test positiv bei Krankheit) und die Spezifität 
+ , Test negativ bei Gesundheit) des Tests betragen jeweils 0.99. 
+Wie hoch ist die Wahrscheinlichkeit für einen Fehlalarm, d. h., dass eine Person tatsächlich gesund ist, obwohl der Test positiv ausfällt?
+
+Antwort:<br>
+Der Test führt zu einem Fehlalarm, wenn die Person gesund $(\bar{A})$ ist, aber der Test positiv $(B)$ ausfällt $P(\bar{A}|B))$. Unter Verwendung der Bayes'schen Logik berechnen wir zuerst die Einzelwahrscheinlichkeiten:<br>
+
+Wahrscheinlichkeit, gesund zu sein, $P(\bar{A}) = 1 - P(A) = 0.99$.
+
+Fehlalarmrate (Wahrscheinlichkeiteines positiven Tests bei Gesundheit) $P(B|\bar{A}) = 1 - Spezifität = 1 - 0.99 = 0.01$.
+
+Wahrscheinlichkeit für einen falsch-positiven Befund: $P(\bar{A} \cap B) = P(B|\bar{A}) * P(\bar{A}) = 0.01 * 0.99 = 0.0099$.
+
+Wahrscheinlichkeit für einen richtig-positiven Befund: $P(A \cap B) = P(B|A) * P(A) = 0.99 * 0.01 = 0.0099$.
+
+Gesamtwahrscheinlichkeit für einen positiven Test: $P(B) = P(A \cap B) + P(\bar{A} \cap B) = 0.0099 + 0.0099 = 0.0198$.
+
+Die gesuchte Wahrscheinlichkeit ist: $P(\bar{A}|B) = \frac{P(\bar{A} \cap B)}{P(B)} = \frac{0.0099}{0.0198} = 0.5$
+
+

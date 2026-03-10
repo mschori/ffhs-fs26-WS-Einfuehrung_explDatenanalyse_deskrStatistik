@@ -184,7 +184,7 @@ Die Werte können jetzt in die Bayes Formel eingesetzt werden.
 
 $P(G | K) = \frac{0.94 * 0.95}{0.895} = \frac{0.893}{0.895} \approx 0.9978$
 
-
+Somit liegt die Wahrscheinlichkeit, dass ein von der Kontrolle als gut eingestuftes Gerät auch tatsächlich gut ist, bei 99.78%.
 
 
 
