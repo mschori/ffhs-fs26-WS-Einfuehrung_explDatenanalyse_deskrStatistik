@@ -1,0 +1,26 @@
+---
+title: "PVA02"
+format: html
+---
+
+# Schnelldurchlauf Vorbereitung zur PVA02
+## Wahrscheinlichkeit
+
+Zufallexperiment: Ein Vorgang, dessen Ergebnis nicht vorhersehbar ist.
+
+Drei Eigenschaften:
+
+- Es gibt mindestens zwei mögliche Ergebnisse
+- Das Ergebnis ist vor der Durchführuing gewiss
+- Das Experiment ist (mindestens gedanklich) wiederholbar
+
+Ergebnisraum (Omega): Die Menge aller möglichen Ergebnisse.
+
+- Es gibt Ergebnisräume, bei denen alle Ereignisse die gleiche Wahrscheinlichkeit haben
+- Und es gibt Ergebnisräume, bei denen nicht alle Ereignisse die gleiche Wahrschleinichkeit haben
+
+## Mengenoperationen
+
+Vereinigung: A oder B (oder beides) tritt ein.
+
+## Bedingte Wahrscheinlichkeiten

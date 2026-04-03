@@ -369,7 +369,7 @@ Der Test führt zu einem Fehlalarm, wenn die Person gesund $(\bar{A})$ ist, aber
 
 Wahrscheinlichkeit, gesund zu sein, $P(\bar{A}) = 1 - P(A) = 0.99$.
 
-Fehlalarmrate (Wahrscheinlichkeiteines positiven Tests bei Gesundheit) $P(B|\bar{A}) = 1 - Spezifität = 1 - 0.99 = 0.01$.
+Fehlalarmrate (Wahrscheinlichkeit eines positiven Tests bei Gesundheit) $P(B|\bar{A}) = 1 - Spezifität = 1 - 0.99 = 0.01$.
 
 Wahrscheinlichkeit für einen falsch-positiven Befund: $P(\bar{A} \cap B) = P(B|\bar{A}) * P(\bar{A}) = 0.01 * 0.99 = 0.0099$.
 
