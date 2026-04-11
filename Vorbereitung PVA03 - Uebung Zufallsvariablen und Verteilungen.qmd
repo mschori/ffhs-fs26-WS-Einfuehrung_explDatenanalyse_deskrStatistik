@@ -1,0 +1,169 @@
+---
+title: "Vorbereitung PVA03 - Uebung Zufallsvariablen und Verteilungen"
+format: html
+execute: 
+  echo: true
+---
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+```
+
+# Daten einlesen und vorbereiten
+
+Die Datei beginnt erst ab Zeile 3.
+
+```{r}
+df_raw <- read_excel("data/lebendgeburten_1970-2017.xlsx", range = "A3:N51")
+```
+
+Jahreszahlen enthalten Text. Also bereinigen.
+
+```{r}
+df <- df_raw |> 
+  rename(Jahr = 1) |> 
+  mutate(Jahr = as.numeric(sub(" .*", "", Jahr))) |> 
+  mutate(across(-Jahr, ~ as.numeric(gsub("[^0-9.]", "", .)))) |> 
+  filter(!is.na(Jahr))
+```
+
+Struktur prüfen.
+
+```{r}
+glimpse(df)
+```
+
+# a) Entwicklung über die Jahre
+
+## Visualisierung
+Hier sind absolute Werte sinnvoll, da wir die Gesamtentwicklung sehen wollen.
+
+```{r}
+ggplot(df, aes(x = Jahr, y = Total)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = label_comma()) +
+  labs(
+    title = "Lebendgeburten in der Schweiz (1970-2017)",
+    x = "Jahr",
+    y = "Anzahl Geburten"
+  ) +
+  theme_minimal()
+```
+
+## Interpretation
+
+**Beobachtungen**
+
+- Rückgang in den 1970er–1990er Jahren
+- Tiefpunkt um 1978 und 2003
+- Jeweils wieder ein Anstieg nach den Tiefpunkten aber nicht mehr so hoch wie 1970
+
+**Mögliche Gründe**
+- Pillenknick (Verhütung)
+- gesellschaftlicher Wandel (Karriere, spätere Familiengründung)
+- wirtschaftliche Unsicherheit
+
+**Fehlende Informationen**
+
+- Bevölkerungsgrösse
+- Altersstruktur der Frauen
+- wirtschaftliche Lage
+- Familienpolitik
+
+---
+
+# b) Verteilung über Monate
+
+## Daten umformen
+
+```{r}
+df_long <- df |> 
+  pivot_longer(
+    cols = -c(Jahr, Total),
+    names_to = "Monat",
+    values_to = "Geburten"
+  )
+```
+
+## Relative Häufigkeiten berechnen
+
+Das macht hier Sinn, sonst verzerren Jahre mit mehr Geburten das Resultat.
+
+```{r}
+df_month <- df_long %>%
+  group_by(Monat) %>%
+  summarise(Geburten = sum(Geburten)) %>%
+  mutate(Anteil = Geburten / sum(Geburten))
+
+# Monate sortieren
+df_month$Monat <- factor(df_month$Monat,
+  levels = c("Januar", "Februar", "März", "April", "Mai", "Juni",
+             "Juli", "August", "September", "Oktober", "November", "Dezember")
+)
+```
+
+## Visualisierung
+
+```{r}
+ggplot(df_month, aes(x = Monat, y = Anteil)) +
+  geom_col() +
+  scale_y_continuous(
+    labels = function(x) paste0(round(x * 100, 1), "%")
+  ) +
+  labs(
+    title = "Durchschnittliche monatliche Verteilung der Geburten",
+    x = "Monat",
+    y = "Anteil"
+  ) +
+  theme_minimal()
+```
+
+## Interpretation
+
+**Beobachtungen**
+
+- Weniger Geburten im Winter
+- Empfängins also eher im Winter
+
+**Mögliche Gründe**
+
+- Soziale Faktoren
+- - Mehr gemeinsame Zeit im Winter
+- - Mehr zu Hause, da kaltes Wetter
+- Geburten im Sommer sind attraktiv, da weniger Infektoinskrankheiten
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
