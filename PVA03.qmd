@@ -1,0 +1,14 @@
+---
+title: "PVA03"
+format: html
+---
+
+# Wichtige Fachbegriffe
+
+- Wahrscheinlichkeit: Komogorov Gesetze
+- Ereignis: Teilmenge des Wahrscheinlichkeitsraumes (Ereignismenge)
+- Zufallsvariable: Jedem Ergebnis des Zufallsexperimentes wird eine Zahl zugeordnet
+- Wahrscheinlichkeitsfunktion (PMF): Die Wahrscheinlichkeit, dass p(x) = P(X = x)
+- Diskrete Gleichverteilung: alle möglichen Resultate haben die gleiche Wahrscheinlichkeit
+- Verteilungsfunktion (CDF): Summiert alle Ereignisse bis zum gewünschten Ereignis auf
+- - Es kummuliert Wahrscheinlichkeiten

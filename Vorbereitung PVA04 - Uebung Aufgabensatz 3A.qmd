@@ -1,0 +1,214 @@
+---
+title: "Vorbereitung PVA04 - Uebung Aufgabensatz 3A"
+format: html
+---
+
+# Aufgabe 1
+Eine Systemadministratorin überprüft kurz von zu Hause aus die Antwortzeiten des Firmenservers
+mit ping-Befehlen. Sie erhält folgende Liste der Antwortzeiten (in Millisekunden):
+28.4, 24.2, 29.1, 25.4, 27.6.
+Wie lauten aufgrund dieser Daten ihre Schätzungen des arithmetischen Mittelwertes und der Standardabweichung der Antwortzeiten des Servers?
+
+```{r}
+zahlen <- c(28.4, 24.2, 29.1, 25.4, 27.6)
+durchschnitt <- mean(zahlen)
+durchschnitt
+```
+
+Für die Standardabweichung kann folgende Formel verwendet werden.
+
+$$S^2 = \frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{x})^2$$
+
+```{r}
+n <- length(zahlen)
+varianz <- (1/(n-1)) * sum((zahlen - durchschnitt)^2)
+varianz
+
+# oder ganz einfach mit der eingebauten Formel var()
+var(zahlen)
+
+# Danach Wurzel ziehen damit S^2 zu S wird.
+sqrt(varianz)
+sqrt(var(zahlen))
+```
+
+
+# Aufgabe 2
+Laut Angaben eines Smartphone-Herstellers ist die mittlere Ladedauer für die Akkus eines bestimmten Modells normalverteilt mit einem Mittelwert von 110 Minuten. Zur Kontrolle entnimmt ein Händler aus einer Lieferung eine Stichprobe von 9 Smartphones und misst die Ladedauern. Der Händler
+erhält für die Stichprobe einen Mittelwert von 115 Minuten.
+
+```{r}
+mu <- 110
+n <- 9
+x_quer <- 115
+```
+
+a) Können Sie aufgrund dieser Informationen bereits entscheiden, ob der Hersteller sein Versprechen bezüglich der mittleren Ladezeit seiner Smartphones eher einhält oder eher nicht einhält?
+
+> Nein, da wichtige Informationen fehlen. Wir müssten wissen, was denn die Standardabweichung/Varianz der Grundgesamtheit ist. Nur dann können wir entscheiden, ob 115 noch in der Varianz von 110 liegt.
+
+---
+
+b) Angenommen, die Stichproben-Standardabweichung betrage 0.3 Minuten. Lässt sich mit dieser
+Zusatzinformation nun entscheiden, ob der Hersteller sein Versprechen eher einhält oder eher
+nicht einhält? Hält er es Ihrer Meinung nach ein (keine Rechnung nötig, grobe Einschätzung genügt)? Ändert sich etwas an Ihrer Antwort, wenn die Standardabweichung 30 statt 0.3 Minuten
+betragen würde?
+
+> Jetzt lässt sich eine Aussage treffen. Bei den 0.3 Minuten handelt es sich um die Stichproben-Standardabweichung. Damit wir den Standardfehler erhalten, müssen wir $\frac{s}{\sqrt{n}}$ berechnen. Und anschliessend den erhaltenen Wert mit der Abweichung von x_quer zu mu vergleichen.
+
+```{r}
+stichproben_standardabweichung <- 0.3
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+
+differenz_mu_x_quer <- x_quer - mu
+differenz_mu_x_quer
+```
+
+Es ist zu erkennen, dass der Wert 5 stark von 0.1 abweicht. Somit ist es eher unwahrscheinlich, dass der Hersteller sein Versprechen einhält.
+
+Anders sieht das aus, wenn die Stichproben-Standardabweichung 30 Minuten beträgt. Dann sieht die Rechnung wie folgt aus.
+
+```{r}
+stichproben_standardabweichung <- 30
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+
+differenz_mu_x_quer
+```
+
+Jetzt liegt der Wert 5 innerhalb von 0-10. Der Standardfehler ist also doppelt so gross wie die Differenz zwischen der in der Stichprobe gemessenen und dem vom Hersteller behaupteten Mittelwert der Ladedauer. Es ist also wahrscheinlich, dass der Hersteller sein Versprechen einhält.
+
+---
+
+c) Angenommen, der Stichproben-Mittelwert betrage immer noch 115 Minuten, aber die Stichprobengrösse sei nicht 9 sondern viel kleiner, z.B. 2 oder 3. Wird es dann im Vergleich zur Stichprobengrösse 9 bei gleich bleibender Stichproben-Standardabweichung eher wahrscheinlicher oder
+eher unwahrscheinlicher, dass der Hersteller sein Versprechen einhält?
+
+> Bei abnehmender Stichprobenanzahl wird es immer wahrscheinlicher, dass der Hersteller sein Versprechen einhält. Das liegt daran, dass bei geringer Stichprobenanzahl die Chance grösser ist, dass zufällig 2 oder 3 Handys ausgewählt wurden, die eine besonderes lange Ladedauer haben. Das lässt sich auf der gleichen Berechnung wie zuvor beweisen.
+
+```{r}
+# Version mit Stichprobenanzahl 3
+n <- 3
+stichproben_standardabweichung <- 0.3
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+differenz_mu_x_quer
+
+stichproben_standardabweichung <- 30
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+
+differenz_mu_x_quer
+
+# Version mit Stichprobenanzahl 2
+n <- 2
+stichproben_standardabweichung <- 0.3
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+differenz_mu_x_quer
+
+stichproben_standardabweichung <- 30
+standardfehler <- stichproben_standardabweichung / sqrt(n)
+standardfehler
+
+differenz_mu_x_quer
+```
+
+> Obwohl der Standardfehler bei einer Stichproben-Standardabweichung von 0.3 Minuten auch bei einer Stichprobenanzahl von 3 oder 2 immer noch sehr gering ist (0.17 und 0.21), ist er im Vergleich zur Stichprobenanzahl von 9 trotzdem gewachsen. Und somit stimmt die Aussage weiterhin, dass bei abnehmender Stichprobenanzahl die Wahrscheinlichkeit steigt, dass der Hersteller sein Versprechen einhält.
+
+
+# Aufgabe 3
+Reale Datensätze sind natürlich interessanter als künstlich erzeugte. Allerdings haben künstlich erzeugte Datensätze auch ihren Nutzen: Anhand eines solchen Datensatzes lässt sich eine statistische Methode einfach ausprobieren und ihre Anwendung überprüfen. Genau das können Sie hier für Konfidenzintervalle tun.
+
+Die beiliegende Datei zufallsdaten3A.RData enthält folgende Variablen (Merkmale):
+
+- id: Identifikationsnummer von $1$ bis $10^5$
+- normvar[1,2]: Zwei Variablen mit normalverteilten Zufallszahlen, jeweils aus derselben Normalverteilung zufällig gezogen
+
+Die beiden Variablen normvar1 und normvar2 können als unabhängige Stichproben aus einer (gemeinsamen) Gesamtheit aufgefasst werden.
+
+```{r}
+objekte <- load("Vorbereitung PVA04 - Uebung Aufgabensatz 3A/zufallsdaten3A.RData")
+objekte
+ls(zufallsdaten)
+```
+
+
+a) Verschaffen Sie sich einen Überblick über die beiden Variablen normvar1 und normvar2. Was ist
+der wichtigste Unterschied zwischen diesen beiden Variablen?
+
+```{r}
+summary_data <- data.frame(
+  # Mittelwert
+  mean = c(mean(zufallsdaten$normvar1, na.rm = TRUE), mean(zufallsdaten$normvar2)),
+  # Standardabweichung
+  sd = c(sd(zufallsdaten$normvar1, na.rm = TRUE), sd(zufallsdaten$normvar2)),
+  # Quantile 25
+  q25 = c(quantile(zufallsdaten$normvar1, 0.25, na.rm = TRUE),
+          quantile(zufallsdaten$normvar2, 0.25)),
+  # Median
+  median = c(median(zufallsdaten$normvar1, na.rm = TRUE),
+             median(zufallsdaten$normvar2)),
+  # Quantiel 75
+  q75 = c(quantile(zufallsdaten$normvar1, 0.75, na.rm = TRUE),
+          quantile(zufallsdaten$normvar2, 0.75)),
+  # Anzahl Beobachtungen
+  n = c(length(zufallsdaten$normvar1), length(zufallsdaten$normvar2)),
+  # Anzahl fehlender Werte
+  na = c(sum(is.na(zufallsdaten$normvar1)), sum(is.na(zufallsdaten$normvar2)))
+)
+
+rownames(summary_data) <- c("normvar1", "normvar2")
+
+summary_data
+```
+
+> Formel Stichproben-Mittelwert (x-quer): $\overline{x} = \frac{1}{n} * \sum_{i=1}^n x_i$
+
+> Standardabweichung Formel: $\sqrt{\frac{1}{n-1} * \sum_{i=1}^n (x_i - \overline{x})^2}$
+
+> MEAN ist x-quer. Standardabweichung ist s (Stichproben-Standardabweichung). Wir kennen $\mu$ und $\sigma$ also nicht.
+
+
+---
+
+b) Bestimmen Sie anhand von normvar1 und normvar2 jeweils ein 90%-Konfidenzintervall für den
+Mittelwert in der (gemeinsamen) Gesamtheit, aus welcher die beiden Zufallsvariablen gezogen
+wurden.
+
+Das lässt sich mit der folgenden Formel erledigen.
+
+$$[\overline{X} - t_{\alpha/2, n-1} * \frac{s}{\sqrt{n}}, \overline{X} + z_{\alpha/2,n-1} * \frac{s}{\sqrt{n}}]$$
+
+Die Formelsammlung gibt für die t-Verteilung keine Tabelle mit. Daher einfach mit R lösen.
+
+```{r}
+t.test(zufallsdaten$normvar1, conf.level = 0.90)
+
+t.test(zufallsdaten$normvar2, conf.level = 0.90)
+```
+
+---
+
+c) Aufgrund welcher der beiden Variablen (Stichproben) lässt sich wohl eine zuverlässigere Aussage
+über den Mittelwert in der Gesamtheit machen? Wie zeigt sich das in den Resultaten aus (ii)?
+
+> normvar2 liefert ein deutlich schmaleres 90%-Konfidenzintervall und lässt somit einen genaueren
+Rückschluss auf den Mittelwert zu. Der Grund dafür ist die deutlich grössere Anzahl Beobachtungen in normvar2 als in normvar1.
+
+---
+
+d) Wieviel mal grösser oder kleiner müsste das Konfidenzintervall basierend auf normvar2 sein im
+Vergleich mit demjenigen basierend auf normvar1? Ist das hier ungefähr so? Warum ist es nicht
+exakt so?
+
+Da die Standardabweichungen in normvar1 und normvar2 sehr ähnlich sind, hängt der Unterschied in der Breite der Konfidenzintervalle fast ausschliesslich von der Anzahl Beobachtungen n1 in normvar1 und n2 in normvar2 ab. Da $n2/n1 = 100$, müsste das Konfidenzintervall für normvar2
+10-mal schmaler sein. Tatsächlich ist das Längenverhältnis $d2/d1 = 0.099$. Das beobachtete Verhältnis stimmt nicht exakt mit dem vorausgesagten überein, weil die Theorie eine Idealisierung ist (z.B. von unendlich vielen Beobachtungen ausgeht und mit Grenzwerten argumentiert). In der
+Praxis sind zufällige Abweichungen davon möglich und auch üblich.
+
+
+
+
+
+
+
